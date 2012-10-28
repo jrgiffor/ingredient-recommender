@@ -17,9 +17,14 @@ def index():
     if you need a simple wiki simple replace the two lines below with:
     return auth.wiki()
     """
-    response.flash = T("Welcome to web2py!")
-    return dict(message=T('Hello World'))
+    response.flash = T("Welcome to ingredient recommender!")
 
+    return dict()
+
+def ingredients():
+    ingredients = db(db.ingredient).select()
+    return dict(ingredients=ingredients, user_id = auth.user_id)
+    
 def user():
     """
     exposes:

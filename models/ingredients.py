@@ -32,17 +32,17 @@ db.define_table('cooking_method',
 db.define_table('ratings_ingredients',
     Field('userId', 'references user'), 
     Field('ingredientId',  'references ingredient'), 
-    Field('rating', integer), 
+    Field('rating', 'integer'), 
     )     
         
 db.define_table('ratings_combination',
     Field('userId',  'references user'), 
     Field('combinationId', 'references combination'), 
-    Field('rating', integer), 
+    Field('rating', 'integer'), 
     )    
     
 db.define_table('ratings_cooking_method',
     Field('userId',  'references user'), 
     Field('cookingId', 'references cooking_method'), 
-    Field('rating', integer), 
+    Field('rating', 'integer'), 
     )

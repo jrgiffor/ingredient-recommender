@@ -1,8 +1,19 @@
+$ Specific web2py directories
 /private
 /sessions
 /cron
 /errors
 /cache
-__init__.pyc
+/databases
 
+# Generated code
+*.pyc
 
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+*.table
+
+# BAK
+*.bak
