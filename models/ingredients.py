@@ -10,12 +10,12 @@ db.define_table('user',
     Field('email', 'string', length=64), 
     )
 
-db.define_table('ingredient',
+db.define_table('ingredients',
     Field('name', 'string', length=64), 
     Field('type', 'string', length=32), 
     )    
 
-db.define_table('combination',
+db.define_table('combinations',
     Field('name', 'string', length=64), 
     ) 
     

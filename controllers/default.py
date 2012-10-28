@@ -20,11 +20,26 @@ def index():
     response.flash = T("Welcome to ingredient recommender!")
 
     return dict()
-
-def ingredients():
-    ingredients = db(db.ingredient).select()
-    return dict(ingredients=ingredients, user_id = auth.user_id)
     
+def ajaxlivesearch():
+    partialstr = request.vars.values()[0]
+    query = db.ingredients.name.like('%'+partialstr+'%')
+    ingredients = db(query).select(db.ingredients.name)
+    items = []
+    for (i,ingredient) in enumerate(ingredients):
+        items.append(DIV(A(ingredient.name, _id="res%s"%i, _href="#", _onclick="copyToBox($('#res%s').html())"%i), _id="resultLiveSearch"))
+
+    return TAG[''](*items)
+    
+def ingredients():
+    ingredients = db(db.ingredients).select()
+    return dict(ingredients=ingredients, user_id = auth.user_id)
+
+@auth.requires_signature()
+def combinations():
+    combinations = db(db.combinations).select()
+    return dict(combinations=combinations, user_id = auth.user_id)
+            
 def user():
     """
     exposes:
