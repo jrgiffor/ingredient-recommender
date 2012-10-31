@@ -10,7 +10,27 @@
 		<title>Recipe Recommender</title>
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
 		</script>
-		
+		<script>
+		function getData(value){
+        	if(value != ""){
+            	$("#ajaxresults").show();
+            	$.post("{{=URL(r=request,f='ajaxlivesearch')}}",{partialstr:value},function(result){
+               	 $("#ajaxresults").html(result);
+            });
+        	}else{
+            	hide();
+        	}
+    	}
+
+    	function hide(){
+        	$("#ajaxresults").hide();
+    	}
+
+    	function copyToBox(value){
+        	$("#ingredients").val(value);
+        	hide();
+   		 }   
+    	</script>
 		<link href="style.css" rel="stylesheet" type="text/css">
 	</head>
 
@@ -44,6 +64,7 @@
 			<form method="post" action="">
 				<textarea name="comments" cols="25" rows="5">Enter some ingredients!
 				</textarea>
+				<!-- <input type="text" id="ingredients" name="ingredients" autocomplete="off" onkeyup="getData(this.value);" /><br /> -->
 				<br>
 				<input type="submit" value="Submit" />
 			</form>
