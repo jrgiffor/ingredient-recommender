@@ -9,18 +9,32 @@
 ## - call exposes all registered services (none by default)
 #########################################################################
 
+from gluon.tools import Crud
+import time
+
 def index():
-    """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
+	# User goes to main page
+	# User starts adding ingredients ->
+	#	This grabs the said ingredient ids from the db and stores them in a list
+	# User presses 'recommend' ->
+	#	This creates a combination, and creates an ingredient_in_combination for each ingredient
+			
+	# Form used to ask for a recommendation
+	# Preconditions: All the ingredients in ingredientList are actual ingredients
+	submitForm=FORM(INPUT(_type='submit',_value='Recommend'))		
+	if submitForm.accepts(request,session):	
+		combinationid = db.combinations.insert(name="temp")
+		for ingredient in session.ingredientList:
+			db.ingredients_in_combination.insert(combinationId=combinationid,ingredientId=ingredient.id)
+		
+	return dict(submitForm=submitForm)
 
-    if you need a simple wiki simple replace the two lines below with:
-    return auth.wiki()
-    """
-    response.flash = T("Welcome to ingredient recommender!")
 
-    return dict()
-    
+def findIngredientName():
+	name = request.vars.values()[0]
+	#result = db(db.ingredients.name == ).select().first()	
+	return name + "oholhlohlholhol"
+	
 def ajaxlivesearch():
     partialstr = request.vars.values()[0]
     query = db.ingredients.name.like('%'+partialstr+'%')
@@ -30,7 +44,7 @@ def ajaxlivesearch():
         items.append(DIV(A(ingredient.name, _id="res%s"%i, _href="#", _onclick="copyToBox($('#res%s').html())"%i), _id="resultLiveSearch"))
 
     return TAG[''](*items)
-    
+  
 def ingredients():
     ingredients = db(db.ingredients).select()
     return dict(ingredients=ingredients, user_id = auth.user_id)

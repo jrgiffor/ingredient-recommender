@@ -13,7 +13,7 @@
   --   3) Create a "Recommend" button that takes you to the "Recommendation" page
   -->
 {{include 'web2py_ajax.html'}}
-
+{{extend 'layout.html'}}
 <html>
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -192,6 +192,21 @@
         hide();
     });
 
+	$(function() {  
+	  $('.error').hide();
+	  $(".button").click(function() {  
+		// validate and process form here 
+		$('.error').hide();  
+		var ingredient = $("input#ingredient").val(); 
+		// validate with some stuff
+		//alert (dataString);return false;  
+        $.post("{{=URL(r=request,f='findIngredientName')}}",{ingredientname:ingredient},function(result){
+            $("#ingredient_spot").html(result);
+		});  
+		return false; 
+	  });  
+	}); 
+	
     function getData(value){
         if(value != ""){
             $("#ajaxresults").show();
@@ -203,49 +218,58 @@
         }
     }
 
+	
     function hide(){
         $("#ajaxresults").hide();
     }
 
     function copyToBox(value){
-        $("#ingredients").val(value);
+        $("#ingredient").val(value);
         hide();
     }   
     </script>
-			<link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+<!--
 	<div id="topbanner">
-			<h1>Ingredient Recommender</h1>
+		<h1>Ingredient Recommender</h1>
 	</div>
 	<div id="toolbars">
-			<div id="loginbar">
-			<p><a href="login.html">Login</a></p>
-			</div>
+		<div id="loginbar">
+		<p><a href="login.html">Login</a></p>
+		</div>
 
-			<div id="settingsbar">
-			<p><a href="settings.html">Settings</a></p>
-			</div>
+		<div id="settingsbar">
+		<p><a href="settings.html">Settings</a></p>
+		</div>
 	</div>
 	<div id="contentsbar"> 
-			<div id="favorites">
-				<h3><a href="favorites.html">Favorites</a></h3>
-			</div>
-			<div id="upcoming">
-				<h3><a href="upcoming.html">Upcoming</a></h3>
-			</div>
-			<div id="delicious">
-				<h3><a href="delicious.html">Delicious</a></h3>
-			</div>
+		<div id="favorites">
+			<h3><a href="favorites.html">Favorites</a></h3>
+		</div>
+		<div id="upcoming">
+			<h3><a href="upcoming.html">Upcoming</a></h3>
+		</div>
+		<div id="delicious">
+			<h3><a href="delicious.html">Delicious</a></h3>
+		</div>
+	</div> -->
+	<div id="ingredientsbox">
+		<div id="combinationform">
+		<form action="" enctype="multipart/form-data" method="post">
+			<label for="ingredient">Search ingredients:</label><br />
+			<input type="text" id="ingredient" name="ingredient" autocomplete="off" onkeyup="getData(this.value);" /><br />
+			<div id="ajaxresults"></div>
+			<input type="submit" name="submit" class="button" id="submit_btn" value="Send" />
+		</form>
+		</div>
+		<div id="ingredientList">
+			<h3> Ingredients: </h3>
+			<div id="ingredient_spot"> </div>
+		</div>
 	</div>
 	<div id="recommend">
-		<h2>Recommend</h2>
-	</div>
-	<div id="ingredientsbox">
-		<label for="ingredient">Search ingredients:</label><br />
-		<input type="text" id="ingredient" name="ingredient" autocomplete="off" onkeyup="getData(this.value);" /><br />
-		<div id="ajaxresults"></div>
-		<div id="listingredientsbox">list of ingredients</div>
+		{{=submitForm}}
 	</div>
 </body>
 </html>
