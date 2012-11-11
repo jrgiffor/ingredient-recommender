@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!-- Thank your Martin Sagastume for providing live search code -->
-<!-- Things to do:
-  --   1) Create an "Add Ingredient" button
+<!-- Things to do:-->
+<!--   1) Create an "Add Ingredient" button
   --   Upon being pressed for the first time:
   --     - Create a new combination with a generated name
   --     - Add the ingredient displayed in the search to the combination
@@ -18,7 +18,7 @@
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <title>Find delicious ingredients!</title>
-
+	
 	<style type="text/css">
     <!--
 	body {
@@ -127,13 +127,25 @@
 	
     <script type="text/javascript" src="{{=URL(r=request,c='static',f='jquery.js')}}"></script>
     <script type="text/javascript">
+    var buttonList = [];
+	//Starts at 1 for simplicity
+	buttonList[1] = "#i1";
+	buttonList[2] = "#i2";
+	buttonList[3] = "#i3";
+	buttonList[4] = "#i4";
+	buttonList[5] = "#i5";
+	var currentButton = 1;
     jQuery(document).ready(function(){
+    	$('#i1').hide();
+    	$('#i2').hide();
+    	$('#i3').hide();
+    	$('#i4').hide();
+    	$('#i5').hide();
+    		
         hide();
-
     });
 	
 	$(function() {  
-
 	  $('.error').hide();
 	  $(".button").click(function() {  
 		// validate and process form here 
@@ -142,7 +154,11 @@
 		//$("#ingredient").val(''); 
 		// validate with some stuff
 		//alert (dataString);return false;  
-        $("div.chosen_ingredients").append(ingredient + '<br>');
+       // $("div.chosen_ingredients").append(ingredient + '<br>');
+        $(buttonList[currentButton]).html(ingredient);
+        $(buttonList[currentButton]).show();
+        var data = #('#i1').html();
+        currentButton++;
 		return false; 
 	  });  
 	}); 
@@ -187,7 +203,11 @@
 		<div id="ingredientList">
 			<h3> Ingredients: </h3>
 			<div class="chosen_ingredients"> 
-				<div class="ingredient">Bananas</div>
+				<button id='i1' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
+				<button id='i2' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
+				<button id='i3' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
+				<button id='i4' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
+				<button id='i5' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
 			</div>
 			
 		</div>
