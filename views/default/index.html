@@ -134,6 +134,16 @@
 	buttonList[3] = "#i3";
 	buttonList[4] = "#i4";
 	buttonList[5] = "#i5";
+	buttonList[6] = "#i6";
+	buttonList[7] = "#i7";
+	buttonList[8] = "#i8";
+	buttonList[9] = "#i9";
+	buttonList[10] = "#i10";
+	buttonList[11] = "#i11";
+	buttonList[12] = "#i12";
+	buttonList[13] = "#i13";
+	buttonList[14] = "#i14";
+	buttonList[15] = "#i15";
 	var currentButton = 1;
     jQuery(document).ready(function(){
     	$('#i1').hide();
@@ -141,6 +151,16 @@
     	$('#i3').hide();
     	$('#i4').hide();
     	$('#i5').hide();
+    	$('#i6').hide();
+    	$('#i7').hide();
+    	$('#i8').hide();
+    	$('#i9').hide();
+    	$('#i10').hide();
+    	$('#i11').hide();
+    	$('#i12').hide();
+    	$('#i13').hide();
+    	$('#i14').hide();
+    	$('#i15').hide();
     		
         hide();
     });
@@ -158,6 +178,7 @@
         $(buttonList[currentButton]).html(ingredient);
         $(buttonList[currentButton]).show();
         currentButton++;
+        if(currentButton==16) currentButton = 1;
 		return false; 
 	  });  
 	}); 
@@ -202,11 +223,21 @@
 		<div id="ingredientList">
 			<h3> Ingredients: </h3>
 			<div class="chosen_ingredients"> 
-				<button id='i1' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
-				<button id='i2' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
-				<button id='i3' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
-				<button id='i4' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
-				<button id='i5' type='button' onclick = "this.style.visibility='hidden', loading.style.visibility='visible'">Add</button>
+				<button id='i1' type='button' onclick = "$('#i1').hide()">Add</button>
+				<button id='i2' type='button' onclick = "$('#i2').hide()">Add</button>
+				<button id='i3' type='button' onclick = "$('#i3').hide()">Add</button>
+				<button id='i4' type='button' onclick = "$('#i4').hide()">Add</button>
+				<button id='i5' type='button' onclick = "$('#i5').hide()">Add</button>
+				<button id='i6' type='button' onclick = "$('#i6').hide()">Add</button>
+				<button id='i7' type='button' onclick = "$('#i7').hide()">Add</button>
+				<button id='i8' type='button' onclick = "$('#i8').hide()">Add</button>
+				<button id='i9' type='button' onclick = "$('#i9').hide()">Add</button>
+				<button id='i10' type='button' onclick = "$('#i10').hide()">Add</button>
+				<button id='i11' type='button' onclick = "$('#i11').hide()">Add</button>
+				<button id='i12' type='button' onclick = "$('#i12').hide()">Add</button>
+				<button id='i13' type='button' onclick = "$('#i13').hide()">Add</button>
+				<button id='i14' type='button' onclick = "$('#i14').hide()">Add</button>
+				<button id='i15' type='button' onclick = "$('#i15').hide()">Add</button>
 			</div>
 			
 		</div>
