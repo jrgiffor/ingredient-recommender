@@ -42,78 +42,8 @@
 	a:visited{
 		color:#D8D8D8;
 	}
-	#topbanner{
-		background-color:#FFD6AD;
-		width: 85%;
-		height: 20%;
-		border: 5px;
-		border-style: solid;
-		border-color: black;
-		border-radius: 15px 15px 15px 15px;
-		z-index:-1;
-		float: left;
-	}
-	#toolbars{
-		text-align: center;
-		padding:1px;
-		width:13%;
-		float: left;
-			position: relative;
-	}
-	#loginbar{
-				
-		border: 2px;
-		border-style:solid;
-		border-radius: 15px;
-			
-		color: black;
-		background-color: yellow;
 
-	}
-	#settingsbar{
-		border: 2px;
-		border-style:solid;
-		border-radius: 15px;
-			
-		color: black;
-		background-color: red;
-		}
-	#contentsbar{
-		display: block;
-		background-color: black;
-		text-align: center;
-		position: relative;
-	}
-	#favorites{
-		width:32%;
-		float:left;
-		background-color: purple;
-		border: 2px;
-		border-style: solid;
-		border-color: black;
-		border-radius: 15px 15px 15px 15px;
-		display:block;
-	}
-	#upcoming{
-		width:32%;
-		float:left;
-		background-color: purple;
-		border: 2px;			
-		border-style: solid;
-		border-color: black;			
-		border-radius: 15px 15px 15px 15px;
-		display:block;
-	}
-	#delicious{
-		width:32%;
-		float:left;
-		background-color: purple;
-		border: 2px;
-		border-style: solid;
-		border-color: black;
-		border-radius: 15px 15px 15px 15px;
-		display:block;
-	}
+
 	#ingredientsbox{		
 		background-color:#FFD6AD;
 		width:50%;
@@ -149,7 +79,16 @@
 		border-color: black;
 		border-radius: 15px 15px 15px 15px;			
 	}
-
+	#delete_ingredients {
+		position: fixed;
+		top:55%;
+	}
+	.ingredient {  
+		color:red; 
+		margin:5px; 
+		cursor:pointer; 
+	}
+	.ingredient:hover { background:yellow; }
 	}
 	ul{
 		list-style-type: none;
@@ -190,19 +129,20 @@
     <script type="text/javascript">
     jQuery(document).ready(function(){
         hide();
-    });
 
+    });
+	
 	$(function() {  
+
 	  $('.error').hide();
 	  $(".button").click(function() {  
 		// validate and process form here 
 		$('.error').hide();  
-		var ingredient = $("input#ingredient").val(); 
+		var ingredient = $("input#ingredient_search").val(); 
+		//$("#ingredient").val(''); 
 		// validate with some stuff
 		//alert (dataString);return false;  
-        $.post("{{=URL(r=request,f='findIngredientName')}}",{ingredientname:ingredient},function(result){
-            $("#ingredient_spot").html(result);
-		});  
+        $("div.chosen_ingredients").append(ingredient + '<br>');
 		return false; 
 	  });  
 	}); 
@@ -224,49 +164,34 @@
     }
 
     function copyToBox(value){
-        $("#ingredient").val(value);
+        $("#ingredient_search").val(value);
         hide();
     }   
+	$(function() {  
+		$("#delete_ingredients").click(function () {
+			$("div.chosen_ingredients").html('');
+		});	
+	});	
     </script>
 </head>
 <body>
-<!--
-	<div id="topbanner">
-		<h1>Ingredient Recommender</h1>
-	</div>
-	<div id="toolbars">
-		<div id="loginbar">
-		<p><a href="login.html">Login</a></p>
-		</div>
-
-		<div id="settingsbar">
-		<p><a href="settings.html">Settings</a></p>
-		</div>
-	</div>
-	<div id="contentsbar"> 
-		<div id="favorites">
-			<h3><a href="favorites.html">Favorites</a></h3>
-		</div>
-		<div id="upcoming">
-			<h3><a href="upcoming.html">Upcoming</a></h3>
-		</div>
-		<div id="delicious">
-			<h3><a href="delicious.html">Delicious</a></h3>
-		</div>
-	</div> -->
 	<div id="ingredientsbox">
 		<div id="combinationform">
 		<form action="" enctype="multipart/form-data" method="post">
-			<label for="ingredient">Search ingredients:</label><br />
-			<input type="text" id="ingredient" name="ingredient" autocomplete="off" onkeyup="getData(this.value);" /><br />
+			<label for="ingredient_search">Search ingredients:</label><br />
+			<input type="text" id="ingredient_search" name="ingredient_search" autocomplete="off" onkeyup="getData(this.value);" /><br />
 			<div id="ajaxresults"></div>
 			<input type="submit" name="submit" class="button" id="submit_btn" value="Send" />
 		</form>
 		</div>
 		<div id="ingredientList">
 			<h3> Ingredients: </h3>
-			<div id="ingredient_spot"> </div>
+			<div class="chosen_ingredients"> 
+				<div class="ingredient">Bananas</div>
+			</div>
+			
 		</div>
+		<button id="delete_ingredients">Delete all ingredients</button>
 	</div>
 	<div id="recommend">
 		{{=submitForm}}

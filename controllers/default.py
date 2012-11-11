@@ -21,19 +21,27 @@ def index():
 			
 	# Form used to ask for a recommendation
 	# Preconditions: All the ingredients in ingredientList are actual ingredients
+	session.ingredientList = []
 	submitForm=FORM(INPUT(_type='submit',_value='Recommend'))		
 	if submitForm.accepts(request,session):	
 		combinationid = db.combinations.insert(name="temp")
-		for ingredient in session.ingredientList:
-			db.ingredients_in_combination.insert(combinationId=combinationid,ingredientId=ingredient.id)
-		
+		session.comboId = combinationid
+		# do some validaiton on the returned string
+		redirect(URL('combinations'))
 	return dict(submitForm=submitForm)
 
 
 def findIngredientName():
 	name = request.vars.values()[0]
-	#result = db(db.ingredients.name == ).select().first()	
-	return name + "oholhlohlholhol"
+#	full_ingredient = db(db.ingredients.name == name).select().first()
+#	if result != None:
+	session.ingredientList.append(name)
+	
+	name_list = ''
+	for each_ingredient in session.ingredientList:
+		name_list = name_list + '<br>' + str(each_ingredient)
+	
+	return name_list
 	
 def ajaxlivesearch():
     partialstr = request.vars.values()[0]
@@ -49,11 +57,15 @@ def ingredients():
     ingredients = db(db.ingredients).select()
     return dict(ingredients=ingredients, user_id = auth.user_id)
 
-@auth.requires_signature()
 def combinations():
-    combinations = db(db.combinations).select()
-    return dict(combinations=combinations, user_id = auth.user_id)
-            
+	user_comboid = session.comboId
+	if user_comboid == None:
+		return dict(user_comboid='None')
+	else:
+		combination = db.combinations[user_comboid]
+		ingredients = db(db.ingredients_in_combination.combinationId == user_comboid).select()
+		return dict(user_comboid=user_comboid,combination=combination,ingredients=ingredients)
+	
 def user():
     """
     exposes:
