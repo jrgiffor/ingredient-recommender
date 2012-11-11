@@ -13,35 +13,26 @@ from gluon.tools import Crud
 import time
 
 def index():
+
+	return dict()
+
+
+def createCombination():
 	# User goes to main page
 	# User starts adding ingredients ->
 	#	This grabs the said ingredient ids from the db and stores them in a list
 	# User presses 'recommend' ->
 	#	This creates a combination, and creates an ingredient_in_combination for each ingredient
-			
-	# Form used to ask for a recommendation
-	# Preconditions: All the ingredients in ingredientList are actual ingredients
-	session.ingredientList = []
-	submitForm=FORM(INPUT(_type='submit',_value='Recommend'))		
-	if submitForm.accepts(request,session):	
-		combinationid = db.combinations.insert(name="temp")
-		session.comboId = combinationid
-		# do some validaiton on the returned string
-		redirect(URL('combinations'))
-	return dict(submitForm=submitForm)
-
-
-def findIngredientName():
-	name = request.vars.values()[0]
+	ingredientList = request.vars.values()[0]
 #	full_ingredient = db(db.ingredients.name == name).select().first()
 #	if result != None:
-	session.ingredientList.append(name)
+	# session.ingredientList.append(name)
+	combinationid = db.combinations.insert(name="temp")
+	session.comboId = combinationid
+	# do some validaiton on the returned string
+	redirect(URL('combinations'))	
 	
-	name_list = ''
-	for each_ingredient in session.ingredientList:
-		name_list = name_list + '<br>' + str(each_ingredient)
-	
-	return name_list
+	return dict()
 	
 def ajaxlivesearch():
     partialstr = request.vars.values()[0]

@@ -147,7 +147,7 @@
 	
 	$(function() {  
 	  $('.error').hide();
-	  $(".button").click(function() {  
+	  $("#submit_btn").click(function() {  
 		// validate and process form here 
 		$('.error').hide();  
 		var ingredient = $("input#ingredient_search").val(); 
@@ -213,7 +213,7 @@
 		<button id="delete_ingredients">Delete all ingredients</button>
 	</div>
 	<div id="recommend">
-		{{=submitForm}}
+		<input type="submit" class="button" id="recommend_btn" value="Recommend" />
 	</div>
 </body>
 </html>
