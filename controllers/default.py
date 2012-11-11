@@ -17,7 +17,7 @@ def index():
 	return dict()
 
 
-def createCombination():
+def createcombination():
 	# User goes to main page
 	# User starts adding ingredients ->
 	#	This grabs the said ingredient ids from the db and stores them in a list
@@ -27,12 +27,12 @@ def createCombination():
 #	full_ingredient = db(db.ingredients.name == name).select().first()
 #	if result != None:
 	# session.ingredientList.append(name)
-	combinationid = db.combinations.insert(name="temp")
-	session.comboId = combinationid
+	#combinationid = db.combinations.insert(name="temp")
+	#session.comboId = combinationid
 	# do some validaiton on the returned string
-	redirect(URL('combinations'))	
+	#redirect(URL('combinations'))	
 	
-	return dict()
+	return ingredientList
 	
 def ajaxlivesearch():
     partialstr = request.vars.values()[0]

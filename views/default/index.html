@@ -183,6 +183,27 @@
 	  });  
 	}); 
 	
+	$(function() {  
+	  $('.error').hide();
+	  $("#recommend_btn").click(function() {  
+		// validate and process form here 
+		$('.error').hide();  
+		//var ingredient = $("input#ingredient_search").val(); 
+		var ingredientList = '';
+		for(var i = 0; i < buttonList.length; i++) {
+			ingredientList += $(buttonList[i]).text();
+			ingredientList += ',';
+		}
+
+		$.post("{{=URL(r=request,f='createcombination')}}",{ingredientList:ingredientList},function(result){
+			alert (result);	
+        });
+		//alert ("Current ingredient list " + ingredientList);		
+		return false; 
+	  });  
+	}); 
+	
+	
     function getData(value){
         if(value != ""){
             $("#ajaxresults").show();
@@ -203,11 +224,6 @@
         $("#ingredient_search").val(value);
         hide();
     }   
-	$(function() {  
-		$("#delete_ingredients").click(function () {
-			$("div.chosen_ingredients").html('');
-		});	
-	});	
     </script>
 </head>
 <body>
@@ -241,7 +257,6 @@
 			</div>
 			
 		</div>
-		<button id="delete_ingredients">Delete all ingredients</button>
 	</div>
 	<div id="recommend">
 		<input type="submit" class="button" id="recommend_btn" value="Recommend" />
