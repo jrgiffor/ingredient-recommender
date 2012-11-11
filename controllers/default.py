@@ -30,7 +30,7 @@ def createcombination():
 	#combinationid = db.combinations.insert(name="temp")
 	#session.comboId = combinationid
 	# do some validaiton on the returned string
-	#redirect(URL('combinations'))	
+	redirect(URL('combinations'))	
 	
 	return ingredientList
 	
