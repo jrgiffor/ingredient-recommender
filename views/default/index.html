@@ -197,7 +197,8 @@
 		}
 
 		$.post("{{=URL(r=request,f='createcombination')}}",{ingredientList:ingredientList},function(result){
-			alert (result);	
+			//alert (result);	
+			window.navigate = "httl://www.google.com";
         });
 		//alert ("Current ingredient list " + ingredientList);		
 		return false; 

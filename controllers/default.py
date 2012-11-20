@@ -18,22 +18,24 @@ def index():
 
 
 def createcombination():
-	# User goes to main page
-	# User starts adding ingredients ->
-	#	This grabs the said ingredient ids from the db and stores them in a list
-	# User presses 'recommend' ->
-	#	This creates a combination, and creates an ingredient_in_combination for each ingredient
-	ingredientList = request.vars.values()[0]
-#	full_ingredient = db(db.ingredients.name == name).select().first()
-#	if result != None:
-	# session.ingredientList.append(name)
-	#combinationid = db.combinations.insert(name="temp")
-	#session.comboId = combinationid
-	# do some validaiton on the returned string
-	redirect(URL('combinations'))	
+	ingredient_input = request.vars.values()[0]
+	ingredient_output = ''
 	
-	return ingredientList
+	ingredient_list = ingredient_input.split(',')
+	combinationid = db.combinations.insert(name="temp")
+	session.comboId = combinationid
+	for each_ingredient in ingredient_list:
+		full_ingredient = db(db.ingredients.name == str(each_ingredient)).select().first()
+		if full_ingredient != None:
+			ingredient_output += str(full_ingredient.name) + ','
+			db.ingredients_in_combination.insert(ingredientId=full_ingredient.id,combinationId=combinationid)
+		else:
+			ingredient_output += 'fail,'
+
+	#redirect(URL('combinations'),type='auto')	
 	
+	return 'combinations'
+
 def ajaxlivesearch():
     partialstr = request.vars.values()[0]
     query = db.ingredients.name.like('%'+partialstr+'%')
@@ -44,9 +46,32 @@ def ajaxlivesearch():
 
     return TAG[''](*items)
   
+def addingredient():
+	add_ingredient_form = SQLFORM(db.ingredients)
+	if add_ingredient_form.process().accepted:
+		# add a new ingredient to the db
+		new_ingredient_id = db.ingredients.insert(name=add_ingredient_form.vars.name, type=add_ingredient_form.vars.type)
+
+		# grab all ingredients that are not the newly inserted
+		other_ingredients = db(db.ingredients.id!=new_ingredient_id).select()
+		# add a relation to each other ingredients
+		for each_ingredient in other_ingredients:
+			db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id, value=0.5)
+			
+	return dict(add_ingredient_form=add_ingredient_form)
+ 
+def recommend():
+	total_group_of_edges = []
+	ingredients_in_combo = db(db.ingredients_in_combination.combinationId==session.comboId).select()
+	for each_ingredient in ingredients_in_combo:
+		total_group_of_edges |= db(db.ingredients_weighted_value.ingredientId1==each_ingredient.ingredientId |
+								   db.ingredients_weighted_value.ingredientId2==each_ingredient.ingredientId).select()
+		
+ 
 def ingredients():
-    ingredients = db(db.ingredients).select()
-    return dict(ingredients=ingredients, user_id = auth.user_id)
+	ingredients = db(db.ingredients).select()
+	ingredient_pairs = db(db.ingredients_weighted_value).select()
+	return dict(ingredients=ingredients, ingredient_pairs=ingredient_pairs)
 
 def combinations():
 	user_comboid = session.comboId

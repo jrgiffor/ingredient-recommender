@@ -11,7 +11,7 @@ db.define_table('user',
     )
 
 db.define_table('ingredients',
-    Field('name', 'string', length=64), 
+    Field('name', 'string', length=64, unique='True'),
     Field('type', 'string', length=32), 
     )    
 
@@ -24,29 +24,36 @@ db.define_table('ingredients_in_combination',
     Field('ingredientId',  'reference ingredients', readable=False), 
     Field('combinationId', 'reference combinations', readable=False), 
     )    
-  
-db.define_table('cooking_method',
-    Field('method', 'string', length=64), 
-    Field('combinationId', 'references combination'), 
-    )   
-  
-db.define_table('ratings_ingredients',
-    Field('userId', 'references user'), 
-    Field('ingredientId',  'references ingredient'), 
-    Field('rating', 'integer'), 
-    Field('posting_date', 'datetime', default=datetime.utcnow(), writable=False, readable=False),
-    )     
-        
-db.define_table('ratings_combination',
-    Field('userId',  'references user'), 
-    Field('combinationId', 'references combination'), 
-    Field('rating', 'integer'), 
-    Field('posting_date', 'datetime', default=datetime.utcnow(), writable=False, readable=False),
-    )    
-    
-db.define_table('ratings_cooking_method',
-    Field('userId',  'references user'), 
-    Field('cookingId', 'references cooking_method'), 
-    Field('rating', 'integer'), 
-    Field('posting_date', 'datetime', default=datetime.utcnow(), writable=False, readable=False),
+ 
+ 
+#db.define_table('cooking_method',
+#    Field('method', 'string', length=64), 
+#    Field('combinationId', 'references combination'), 
+#    )   
+
+db.define_table('ingredients_weighted_value',
+    Field('ingredientId1',  'reference ingredients'), 
+    Field('ingredientId2',  'reference ingredients'),
+    Field('value', 'double'),
     )
+              
+#db.define_table('ratings_ingredients',
+#    Field('userId', 'references user'), 
+#    Field('ingredientId',  'references ingredient'), 
+#    Field('rating', 'integer'), 
+#    Field('posting_date', 'datetime', default=datetime.utcnow(), writable=False, readable=False),
+#    )     
+        
+#db.define_table('ratings_combination',
+#    Field('userId',  'references user'), 
+#    Field('combinationId', 'references combination'), 
+#    Field('rating', 'integer'), 
+#    Field('posting_date', 'datetime', default=datetime.utcnow(), writable=False, readable=False),
+#    )    
+    
+#db.define_table('ratings_cooking_method',
+#    Field('userId',  'references user'), 
+#    Field('cookingId', 'references cooking_method'), 
+#    Field('rating', 'integer'), 
+#    Field('posting_date', 'datetime', default=datetime.utcnow(), writable=False, readable=False),
+#    )
