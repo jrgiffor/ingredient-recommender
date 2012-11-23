@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!-- Thank your Martin Sagastume for providing live search code -->
-<!-- Things to do:
-  --   1) Create an "Add Ingredient" button
+<!-- Things to do:-->
+<!--   1) Create an "Add Ingredient" button
   --   Upon being pressed for the first time:
   --     - Create a new combination with a generated name
   --     - Add the ingredient displayed in the search to the combination
@@ -13,12 +13,12 @@
   --   3) Create a "Recommend" button that takes you to the "Recommendation" page
   -->
 {{include 'web2py_ajax.html'}}
-
+{{extend 'layout.html'}}
 <html>
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <title>Find delicious ingredients!</title>
-
+	
 	<style type="text/css">
     <!--
 	body {
@@ -26,6 +26,7 @@
 		background-color: #FFFFD6;
 		font-family: 'McLaren', serif;
 		font-size: 18px;
+		text-align: center;
 	}
 	h1{
 		font-size: 46px;
@@ -42,78 +43,8 @@
 	a:visited{
 		color:#D8D8D8;
 	}
-	#topbanner{
-		background-color:#FFD6AD;
-		width: 85%;
-		height: 20%;
-		border: 5px;
-		border-style: solid;
-		border-color: black;
-		border-radius: 15px 15px 15px 15px;
-		z-index:-1;
-		float: left;
-	}
-	#toolbars{
-		text-align: center;
-		padding:1px;
-		width:13%;
-		float: left;
-			position: relative;
-	}
-	#loginbar{
-				
-		border: 2px;
-		border-style:solid;
-		border-radius: 15px;
-			
-		color: black;
-		background-color: yellow;
 
-	}
-	#settingsbar{
-		border: 2px;
-		border-style:solid;
-		border-radius: 15px;
-			
-		color: black;
-		background-color: red;
-		}
-	#contentsbar{
-		display: block;
-		background-color: black;
-		text-align: center;
-		position: relative;
-	}
-	#favorites{
-		width:32%;
-		float:left;
-		background-color: purple;
-		border: 2px;
-		border-style: solid;
-		border-color: black;
-		border-radius: 15px 15px 15px 15px;
-		display:block;
-	}
-	#upcoming{
-		width:32%;
-		float:left;
-		background-color: purple;
-		border: 2px;			
-		border-style: solid;
-		border-color: black;			
-		border-radius: 15px 15px 15px 15px;
-		display:block;
-	}
-	#delicious{
-		width:32%;
-		float:left;
-		background-color: purple;
-		border: 2px;
-		border-style: solid;
-		border-color: black;
-		border-radius: 15px 15px 15px 15px;
-		display:block;
-	}
+
 	#ingredientsbox{		
 		background-color:#FFD6AD;
 		width:50%;
@@ -147,9 +78,19 @@
 		border: 10px;
 		border-style: solid;
 		border-color: black;
-		border-radius: 15px 15px 15px 15px;			
+		border-radius: 15px 15px 15px 15px;		
+		text-align: center;	
 	}
-
+	#delete_ingredients {
+		position: fixed;
+		top:55%;
+	}
+	.ingredient {  
+		color:red; 
+		margin:5px; 
+		cursor:pointer; 
+	}
+	.ingredient:hover { background:yellow; }
 	}
 	ul{
 		list-style-type: none;
@@ -188,10 +129,83 @@
 	
     <script type="text/javascript" src="{{=URL(r=request,c='static',f='jquery.js')}}"></script>
     <script type="text/javascript">
+    var buttonList = [];
+	//Starts at 1 for simplicity
+	buttonList[1] = "#i1";
+	buttonList[2] = "#i2";
+	buttonList[3] = "#i3";
+	buttonList[4] = "#i4";
+	buttonList[5] = "#i5";
+	buttonList[6] = "#i6";
+	buttonList[7] = "#i7";
+	buttonList[8] = "#i8";
+	buttonList[9] = "#i9";
+	buttonList[10] = "#i10";
+	buttonList[11] = "#i11";
+	buttonList[12] = "#i12";
+	buttonList[13] = "#i13";
+	buttonList[14] = "#i14";
+	buttonList[15] = "#i15";
+	var currentButton = 1;
     jQuery(document).ready(function(){
+    	$('#i1').hide();
+    	$('#i2').hide();
+    	$('#i3').hide();
+    	$('#i4').hide();
+    	$('#i5').hide();
+    	$('#i6').hide();
+    	$('#i7').hide();
+    	$('#i8').hide();
+    	$('#i9').hide();
+    	$('#i10').hide();
+    	$('#i11').hide();
+    	$('#i12').hide();
+    	$('#i13').hide();
+    	$('#i14').hide();
+    	$('#i15').hide();
         hide();
     });
+	
+	$(function() {  
+	  $('.error').hide();
+	  $("#submit_btn").click(function() {  
+		// validate and process form here 
+		$('.error').hide();  
+		var ingredient = $("input#ingredient_search").val(); 
+		//$("#ingredient").val(''); 
+		// validate with some stuff
+		//alert (dataString);return false;  
+       // $("div.chosen_ingredients").append(ingredient + '<br>');
+        $(buttonList[currentButton]).html(ingredient);
+        $(buttonList[currentButton]).show();
+        currentButton++;
+        if(currentButton==16) currentButton = 1;
+		return false; 
+	  });  
+	}); 
+	
+	$(function() {  
+	  $('.error').hide();
+	  $("#recommend_btn").click(function() {  
+		// validate and process form here 
+		$('.error').hide();  
+		//var ingredient = $("input#ingredient_search").val(); 
+		var ingredientList = '';
+		for(var i = 0; i < buttonList.length; i++) {
+			ingredientList += $(buttonList[i]).text();
+			ingredientList += ',';
+		}
 
+		$.post("{{=URL(r=request,f='createcombination')}}",{ingredientList:ingredientList},function(result){
+			//alert (result);	
+			window.navigate = "httl://www.google.com";
+        });
+		//alert ("Current ingredient list " + ingredientList);		
+		return false; 
+	  });  
+	}); 
+	
+	
     function getData(value){
         if(value != ""){
             $("#ajaxresults").show();
@@ -203,49 +217,51 @@
         }
     }
 
+	
     function hide(){
         $("#ajaxresults").hide();
     }
 
     function copyToBox(value){
-        $("#ingredients").val(value);
+        $("#ingredient_search").val(value);
         hide();
     }   
     </script>
-			<link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-	<div id="topbanner">
-			<h1>Ingredient Recommender</h1>
-	</div>
-	<div id="toolbars">
-			<div id="loginbar">
-			<p><a href="login.html">Login</a></p>
+	<div id="ingredientsbox">
+		<div id="combinationform">
+		<form action="" enctype="multipart/form-data" method="post">
+			<label for="ingredient_search">Search ingredients:</label><br />
+			<input type="text" id="ingredient_search" name="ingredient_search" autocomplete="off" onkeyup="getData(this.value);" /><br />
+			<div id="ajaxresults"></div>
+			<input type="submit" name="submit" class="button" id="submit_btn" value="Send" />
+		</form>
+		</div>
+		<div id="ingredientList">
+			<h3> Ingredients </h3>
+			<div class="chosen_ingredients"> 
+				<button id='i1' type='button' onclick = "$('#i1').hide()">Add</button>
+				<button id='i2' type='button' onclick = "$('#i2').hide()">Add</button>
+				<button id='i3' type='button' onclick = "$('#i3').hide()">Add</button>
+				<button id='i4' type='button' onclick = "$('#i4').hide()">Add</button>
+				<button id='i5' type='button' onclick = "$('#i5').hide()">Add</button>
+				<button id='i6' type='button' onclick = "$('#i6').hide()">Add</button>
+				<button id='i7' type='button' onclick = "$('#i7').hide()">Add</button>
+				<button id='i8' type='button' onclick = "$('#i8').hide()">Add</button>
+				<button id='i9' type='button' onclick = "$('#i9').hide()">Add</button>
+				<button id='i10' type='button' onclick = "$('#i10').hide()">Add</button>
+				<button id='i11' type='button' onclick = "$('#i11').hide()">Add</button>
+				<button id='i12' type='button' onclick = "$('#i12').hide()">Add</button>
+				<button id='i13' type='button' onclick = "$('#i13').hide()">Add</button>
+				<button id='i14' type='button' onclick = "$('#i14').hide()">Add</button>
+				<button id='i15' type='button' onclick = "$('#i15').hide()">Add</button>
 			</div>
-
-			<div id="settingsbar">
-			<p><a href="settings.html">Settings</a></p>
-			</div>
-	</div>
-	<div id="contentsbar"> 
-			<div id="favorites">
-				<h3><a href="favorites.html">Favorites</a></h3>
-			</div>
-			<div id="upcoming">
-				<h3><a href="upcoming.html">Upcoming</a></h3>
-			</div>
-			<div id="delicious">
-				<h3><a href="delicious.html">Delicious</a></h3>
-			</div>
+			
+		</div>
 	</div>
 	<div id="recommend">
-		<h2>Recommend</h2>
-	</div>
-	<div id="ingredientsbox">
-		<label for="ingredient">Search ingredients:</label><br />
-		<input type="text" id="ingredient" name="ingredient" autocomplete="off" onkeyup="getData(this.value);" /><br />
-		<div id="ajaxresults"></div>
-		<div id="listingredientsbox">list of ingredients</div>
+		<input type="submit" class="button" id="recommend_btn" value="Recommend" />
 	</div>
 </body>
 </html>
