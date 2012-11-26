@@ -46,6 +46,7 @@ def ajaxlivesearch():
 
     return TAG[''](*items)
   
+# for some reason, adds a copy of each ingredient as well
 def addingredient():
 	add_ingredient_form = SQLFORM(db.ingredients)
 	if add_ingredient_form.process().accepted:
@@ -62,10 +63,15 @@ def addingredient():
  
 def recommend():
 	total_group_of_edges = []
+	# grab all the ingredients in the combo
 	ingredients_in_combo = db(db.ingredients_in_combination.combinationId==session.comboId).select()
 	for each_ingredient in ingredients_in_combo:
-		total_group_of_edges |= db(db.ingredients_weighted_value.ingredientId1==each_ingredient.ingredientId |
-								   db.ingredients_weighted_value.ingredientId2==each_ingredient.ingredientId).select()
+		# select all ingredient relations that have only one ingredient in the combo
+		# look at alias'
+		total_group_of_edges |= db(db.ingredients_weighted_value.ingredientId1==each_ingredient.ingredientId).select()
+		# group by the other ingredient in the pairing and then avg the value
+		
+	return dict(total_group_of_edges=total_group_of_edges)
 		
  
 def ingredients():
