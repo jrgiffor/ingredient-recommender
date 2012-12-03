@@ -89,8 +89,8 @@ def recommend():
 	#	"closest distance" ranking for beef would be sqrt(val(beef, bell pepper)^2 + val(beef, onion)^2)
 	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=chosen_ingredient.name|other_ingredient.name)
 	
-	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name)
-		
+	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 2))
+
 	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex_rec_ingredients=complex_rec_ingredients)
 		
  
