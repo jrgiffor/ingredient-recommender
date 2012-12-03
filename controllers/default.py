@@ -11,6 +11,7 @@
 
 from gluon.sql import Rows
 from gluon.tools import Crud
+from math import sqrt
 import time
 
 def index():
@@ -93,7 +94,8 @@ def recommend():
 	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=chosen_ingredient.name|other_ingredient.name)
 	for each_ingredient in complex_rec_ingredients:
 		if each_ingredient.other_ingredient.name in compute_value:
-			compute_value[each_ingredient.other_ingredient.name] = sqrt(pow(compute_value[each_ingredient.other_ingredient.name],2) + db.ingredients_weighted_value.value.avg())
+			ongoing_value = compute_value[each_ingredient.other_ingredient.name]
+			compute_value[each_ingredient.other_ingredient.name] = sqrt(pow(ongoing_value,2) + db.ingredients_weighted_value.value.avg())
 		else:
 			compute_value[each_ingredient.other_ingredient.name] = db.ingredients_weighted_value.value.avg()
 	
