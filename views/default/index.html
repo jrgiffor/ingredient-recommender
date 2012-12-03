@@ -176,12 +176,12 @@
 		var dup = false;
 		for(var j =0;j<buttonList.length;j++)
 		{
-			if(ingredient==buttonList[i].text()){
+			if(ingredient+" ✖"==buttonList[i].text()){
 				dup = true;
 			}
 		}
 		if(!dup){
-		 	$(buttonList[currentButton]).html(ingredient);
+		 	$(buttonList[currentButton]).html(ingredient+" ✖");
      			$(buttonList[currentButton]).show();
         		currentButton++;
 		}
