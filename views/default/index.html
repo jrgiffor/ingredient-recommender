@@ -172,6 +172,7 @@
 		// validate and process form here 
 		$('.error').hide();  
 		var ingredient = $("input#ingredient_search").val(); 
+        $("input#ingredient_search").val(''); 
         ingredient = ingredient.toLowerCase();
          var dup = false;
 		for(var j =0;j<buttonList.length;j++)
@@ -248,21 +249,21 @@
 		<div id="ingredientList">
 			<h3> Ingredients </h3>
 			<div class="chosen_ingredients"> 
-				<button id='i1' type='button' onclick = "$('#i1).html('');$('#i1').hide()">Add</button>
-				<button id='i2' type='button' onclick = "$('#i2).html('');$('#i2').hide()">Add</button>
-				<button id='i3' type='button' onclick = "$('#i3).html('');$('#i3').hide()">Add</button>
-				<button id='i4' type='button' onclick = "$('#i4).html('');$('#i4').hide()">Add</button>
-				<button id='i5' type='button' onclick = "$('#i5).html('');$('#i5').hide()">Add</button>
-				<button id='i6' type='button' onclick = "$('#i6).html('');$('#i6').hide()">Add</button>
-				<button id='i7' type='button' onclick = "$('#i7).html('');$('#i7').hide()">Add</button>
-				<button id='i8' type='button' onclick = "$('#i8).html('');$('#i8').hide()">Add</button>
-				<button id='i9' type='button' onclick = "$('#i9).html('');$('#i9').hide()">Add</button>
-				<button id='i10' type='button' onclick = "$('#i10).html('');$('#i10').hide()">Add</button>
-				<button id='i11' type='button' onclick = "$('#i11).html('');$('#i11').hide()">Add</button>
-				<button id='i12' type='button' onclick = "$('#i12).html('');$('#i12').hide()">Add</button>
-				<button id='i13' type='button' onclick = "$('#i13).html('');$('#i13').hide()">Add</button>
-				<button id='i14' type='button' onclick = "$('#i14).html('');$('#i14').hide()">Add</button>
-				<button id='i15' type='button' onclick = "$('#i15).html('');$('#i15').hide()">Add</button>
+				<button id='i1' type='button' onclick = "$('#i1').html('');$('#i1').hide();">Add</button>
+				<button id='i2' type='button' onclick = "$('#i2').html('');$('#i2').hide();">Add</button>
+				<button id='i3' type='button' onclick = "$('#i3').html('');$('#i3').hide();">Add</button>
+				<button id='i4' type='button' onclick = "$('#i4').html('');$('#i4').hide();">Add</button>
+				<button id='i5' type='button' onclick = "$('#i5').html('');$('#i5').hide();">Add</button>
+				<button id='i6' type='button' onclick = "$('#i6').html('');$('#i6').hide();">Add</button>
+				<button id='i7' type='button' onclick = "$('#i7').html('');$('#i7').hide();">Add</button>
+				<button id='i8' type='button' onclick = "$('#i8').html('');$('#i8').hide();">Add</button>
+				<button id='i9' type='button' onclick = "$('#i9').html('');$('#i9').hide();">Add</button>
+				<button id='i10' type='button' onclick = "$('#i10').html('');$('#i10').hide();">Add</button>
+				<button id='i11' type='button' onclick = "$('#i11').html('');$('#i11').hide();">Add</button>
+				<button id='i12' type='button' onclick = "$('#i12').html('');$('#i12').hide();">Add</button>
+				<button id='i13' type='button' onclick = "$('#i13').html('');$('#i13').hide();">Add</button>
+				<button id='i14' type='button' onclick = "$('#i14').html('');$('#i14').hide();">Add</button>
+				<button id='i15' type='button' onclick = "$('#i15').html('');$('#i15').hide();">Add</button>
 			</div>
 			
 		</div>
