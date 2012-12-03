@@ -18,6 +18,7 @@ def index():
 	return dict()
 
 
+# make everything lower case
 def createcombination():
 	ingredient_input = request.vars.values()[0]
 	ingredient_output = ''
@@ -26,7 +27,7 @@ def createcombination():
 	combinationid = db.combinations.insert(name="temp")
 	session.comboId = combinationid
 	for each_ingredient in ingredient_list:
-		full_ingredient = db(db.ingredients.name == str(each_ingredient)).select().first()
+		full_ingredient = db(db.ingredients.name.lower() == str(each_ingredient).lower()).select().first()
 		if full_ingredient != None:
 			ingredient_output += str(full_ingredient.name) + ','
 			db.ingredients_in_combination.insert(ingredientId=full_ingredient.id,combinationId=combinationid)
