@@ -1,10 +1,11 @@
 {{extend 'layout.html'}}
 <h1>Try some lovely ingredients!</h1>
-{{#=BEAUTIFY(response._vars)}}
 <h2>You want to make some delicious foods using these ingredients:</h2>
-{{=ingredient_names_in_combo}}
-
+{{for each_ingredient in ingredient_names_in_combo:}}
+{{=LI(A(each_ingredient.name))}}
+{{pass}}
 <h2>Try these recommendations </h2>
-{{=simple_rec_ingredients}}
+{{for each_recommendation in simple_rec_ingredients:}}
+{{=LI(A(each_recommendation.other_ingredient.name))}}
+{{pass}}
 <h2>Or these recommendations </h2>
-{{=complex_rec_ingredients}}

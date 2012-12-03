@@ -33,7 +33,7 @@ def createcombination():
 		else:
 			ingredient_output += 'fail,'
 
-	#redirect(URL('combinations'),type='auto')	
+	redirect(URL('recommend'),type='auto')	
 	
 	return ingredient_output
 
@@ -81,6 +81,8 @@ def recommend():
 	ingredient_name_query =  chosen_ingredient.id.belongs(ingredients_in_combo)
 	ingredient_name_query &= ~other_ingredient.id.belongs(ingredients_in_combo)
 	
+	# let this save the value of the computed "closest distance"
+	compute_value = {}
 	# things to do to improve complex_rec_ingredients:
 	# take the "closest distance" for all the ingredients. 
 	# let val(ingredient1, ingredient2) stand for the AVG value of all ingredient1-ingredient2, value pairings
@@ -88,10 +90,16 @@ def recommend():
 	# for example for the ingredient pairings: beef-bell pepper and beef-onion, 
 	#	"closest distance" ranking for beef would be sqrt(val(beef, bell pepper)^2 + val(beef, onion)^2)
 	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=chosen_ingredient.name|other_ingredient.name)
+	for each_ingredient in complex_rec_ingredients:
+		ingredient_value = compute_value[each_ingredient.other_ingredient.name]
+		if ingredient_value != None:
+			compute_value[each_ingredient.other_ingredient.name] == sqrt(ingredient_value * ingredient_value + db.ingredients_weighted_value.value.avg())
+		else:
+			compute_value[each_ingredient.other_ingredient.name] = ingredient_value
 	
 	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 2))
 
-	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex_rec_ingredients=complex_rec_ingredients)
+	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients)
 		
  
 def ingredients():
