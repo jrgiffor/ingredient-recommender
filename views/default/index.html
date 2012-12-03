@@ -200,10 +200,10 @@
 		//var ingredient = $("input#ingredient_search").val(); 
 		var ingredientList = '';
 		for(var i = 0; i < buttonList.length; i++) {
-			ingredientList += $(buttonList[i]).text();
+			var curr = $(buttonList[i]).text().replace(" ✖", '');
+			ingredientList += curr;
 			ingredientList += ',';
 		}
-
 		$.post("{{=URL(r=request,f='createcombination')}}",{ingredientList:ingredientList},function(result){
 			window.navigate("recommend.html");
         });
