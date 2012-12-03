@@ -172,26 +172,20 @@
 		// validate and process form here 
 		$('.error').hide();  
 		var ingredient = $("input#ingredient_search").val(); 
-		ingredient = ingredient.toLowerCase();
-		var dup = false;
+        ingredient = ingredient.toLowerCase();
+         var dup = false;
 		for(var j =0;j<buttonList.length;j++)
 		{
-			if(ingredient+" ✖"==buttonList[i].text()){
-				dup = true;
-			}
+            var curr = $(buttonList[j]).text();
+            if(ingredient+ " ✖"==curr){
+            dup = true;
+            }
 		}
-		if(!dup){
-		 	$(buttonList[currentButton]).html(ingredient+" ✖");
+           if(!dup){
+				$(buttonList[currentButton]).html(ingredient+" ✖");
      			$(buttonList[currentButton]).show();
         		currentButton++;
-		}
-		else{
-			
-		}
-		//$("#ingredient").val(''); 
-		// validate with some stuff
-		//alert (dataString);return false;  
-       // $("div.chosen_ingredients").append(ingredient + '<br>');
+            }
 
         if(currentButton==16) currentButton = 1;
 		return false; 
