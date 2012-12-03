@@ -211,7 +211,7 @@
 		}
 
 		$.post("{{=URL(r=request,f='createcombination')}}",{ingredientList:ingredientList},function(result){
-			alert (result);	
+			window.navigate("recommend.html");
         });
 		//alert ("Current ingredient list " + ingredientList);		
 		return false; 
