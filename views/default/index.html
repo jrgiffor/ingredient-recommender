@@ -172,6 +172,7 @@
 		// validate and process form here 
 		$('.error').hide();  
 		var ingredient = $("input#ingredient_search").val(); 
+        $("input#ingredient_search").val(''); 
         ingredient = ingredient.toLowerCase();
          var dup = false;
 		for(var j =0;j<buttonList.length;j++)
