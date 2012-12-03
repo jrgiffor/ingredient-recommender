@@ -9,6 +9,7 @@
 ## - call exposes all registered services (none by default)
 #########################################################################
 
+from gluon.sql import Rows
 from gluon.tools import Crud
 import time
 
@@ -34,7 +35,7 @@ def createcombination():
 
 	#redirect(URL('combinations'),type='auto')	
 	
-	return 'combinations'
+	return ingredient_output
 
 def ajaxlivesearch():
     partialstr = request.vars.values()[0]
@@ -57,21 +58,40 @@ def addingredient():
 		other_ingredients = db(db.ingredients.id!=new_ingredient_id).select()
 		# add a relation to each other ingredients
 		for each_ingredient in other_ingredients:
-			db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id, value=0.5)
+			db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id)
 			
 	return dict(add_ingredient_form=add_ingredient_form)
  
 def recommend():
-	total_group_of_edges = []
+	total_group_of_edges = None
 	# grab all the ingredients in the combo
-	ingredients_in_combo = db(db.ingredients_in_combination.combinationId==session.comboId).select()
-	for each_ingredient in ingredients_in_combo:
-		# select all ingredient relations that have only one ingredient in the combo
-		# look at alias'
-		total_group_of_edges |= db(db.ingredients_weighted_value.ingredientId1==each_ingredient.ingredientId).select()
-		# group by the other ingredient in the pairing and then avg the value
+	find_ingredients_query = db.ingredients_in_combination.combinationId == session.comboId
+	find_ingredients_query &= db.ingredients_in_combination.ingredientId == db.ingredients.id
+	ingredients_in_combo = db(find_ingredients_query).select(db.ingredients.id)
+	ingredient_names_in_combo = db(find_ingredients_query).select(db.ingredients.name, db.ingredients.type)
+	# select all ingredient relations that have only one ingredient in the combo
+	#lhs_ingredients = db(db.ingredients_weighted_value.ingredientId1==each_ingredient.id).select()
+	chosen_ingredient = db.ingredients.with_alias('chosen_ingredient')
+	other_ingredient  = db.ingredients.with_alias('other_ingredient')
+	
+	#ingredient_name_query =  (chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
+	#ingredient_name_query |= (chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
+	
+	# grab all ingredients related to the one chosen
+	ingredient_name_query =  chosen_ingredient.id.belongs(ingredients_in_combo)
+	ingredient_name_query &= ~other_ingredient.id.belongs(ingredients_in_combo)
+	
+	# things to do to improve complex_rec_ingredients:
+	# take the "closest distance" for all the ingredients. 
+	# let val(ingredient1, ingredient2) stand for the AVG value of all ingredient1-ingredient2, value pairings
+	# and "closest distance" would be sqrt(val(ingredient1,ingredientK)^2 + val(ingredient2,ingredientK)^2 + ... + val(ingredientN,ingredientK)^2)
+	# for example for the ingredient pairings: beef-bell pepper and beef-onion, 
+	#	"closest distance" ranking for beef would be sqrt(val(beef, bell pepper)^2 + val(beef, onion)^2)
+	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=chosen_ingredient.name|other_ingredient.name)
+	
+	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name)
 		
-	return dict(total_group_of_edges=total_group_of_edges)
+	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex_rec_ingredients=complex_rec_ingredients)
 		
  
 def ingredients():
