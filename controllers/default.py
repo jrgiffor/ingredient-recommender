@@ -13,6 +13,7 @@ from gluon.sql import Rows
 from gluon.tools import Crud
 from math import sqrt
 import time
+import operator
 
 def index():
 
@@ -94,14 +95,20 @@ def recommend():
 	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=chosen_ingredient.name|other_ingredient.name)
 	for each_ingredient in complex_rec_ingredients:
 		if each_ingredient.other_ingredient.name in compute_value:
-			ongoing_value = compute_value[str(each_ingredient.other_ingredient.name)]
-			compute_value[each_ingredient.other_ingredient.name] = sqrt(db.ingredients_weighted_value.value.avg())
+			ongoing_value = float(compute_value[each_ingredient.other_ingredient.name])
+			compute_value[each_ingredient.other_ingredient.name] = sqrt(pow(ongoing_value, 2) + pow(float(db.ingredients_weighted_value.value.avg)(), 2))
 		else:
 			compute_value[each_ingredient.other_ingredient.name] = db.ingredients_weighted_value.value.avg()
 	
-	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 2))
+	sorted_recommendations = sorted(compute_value.iteritems(), key=operator.itemgetter(1))
+	top_ingredients = []
+	# this will grab the top three ingredients
+	for index in range(3):
+		top_ingredients.append(sorted_recommendations[index][0])
+		
+	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
 
-	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients)
+	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex_rec_ingredients=top_ingredients)
 		
  
 def ingredients():
