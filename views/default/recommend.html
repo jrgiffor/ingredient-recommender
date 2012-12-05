@@ -14,7 +14,8 @@
 </div>
 <h2>Or these recommendations </h2>
 <div id=complex_rec_ingredients>
-{{#for each_recommendation in complex_rec_ingredients:}}
-{{#=DIV(each_recommendation, _id='complex_rec_'+each_recommendation, _class='complex_rec_ingredient')}}
-{{#pass}}
+{{=complex_rec_ingredients}}
+{{for each_recommendation in complex2_rec_ingredients:}}
+{{=DIV(each_recommendation, _id='complex_rec_'+each_recommendation, _class='complex_rec_ingredient')}}
+{{pass}}
 </div>
