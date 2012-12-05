@@ -60,8 +60,9 @@ def addingredient():
 		# grab all ingredients that are not the newly inserted
 		other_ingredients = db(db.ingredients.id!=new_ingredient_id).select()
 		# add a relation to each other ingredients
-		for each_ingredient in other_ingredients:
-			db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id)
+		if other_ingredients != None:
+			for each_ingredient in other_ingredients:
+				db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id)
 			
 	return dict(add_ingredient_form=add_ingredient_form)
  
@@ -92,14 +93,14 @@ def recommend():
 	# and "closest distance" would be sqrt(val(ingredient1,ingredientK)^2 + val(ingredient2,ingredientK)^2 + ... + val(ingredientN,ingredientK)^2)
 	# for example for the ingredient pairings: beef-bell pepper and beef-onion, 
 	#	"closest distance" ranking for beef would be sqrt(val(beef, bell pepper)^2 + val(beef, onion)^2)
-	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=chosen_ingredient.name|other_ingredient.name)
+	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg().with_alias('AVG_ing_value'), groupby=chosen_ingredient.name|other_ingredient.name)
 	for each_ingredient in complex_rec_ingredients:
 		if each_ingredient.other_ingredient.name in compute_value:
 			ongoing_value = compute_value[each_ingredient.other_ingredient.name]
-		#	response.flash=T(str(ongoing_value))
-		#	compute_value[each_ingredient.other_ingredient.name] = sqrt(pow(ongoing_value, 2) + pow(float(db.ingredients_weighted_value.value.avg)(), 2))
+			#response.flash=T(str(ongoing_value))
+			compute_value[each_ingredient.other_ingredient.name] = sqrt(pow(ongoing_value, 2) + pow(each_ingredient.AVG_ing_value, 2))
 		else:
-			compute_value[each_ingredient.other_ingredient.name] = 1 #each_ingredient.ingredients_weighted_value
+			compute_value[each_ingredient.other_ingredient.name] = each_ingredient.AVG_ing_value
 	
 	sorted_recommendations = sorted(compute_value.iteritems(), key=operator.itemgetter(1))
 	top_ingredients = []
@@ -109,7 +110,7 @@ def recommend():
 		
 	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
 	# , complex_rec_ingredients=top_ingredients
-	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex_rec_ingredients=complex_rec_ingredients, complex2_rec_ingredients=top_ingredients)
+	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex2_rec_ingredients=top_ingredients)
 	
 # create a function to accept input from the recommendations page. This will be ajax and should return true 
 def recieve_rating():
