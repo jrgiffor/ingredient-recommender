@@ -58,12 +58,13 @@ def addingredient():
 		new_ingredient_id = db.ingredients.insert(name=add_ingredient_form.vars.name, type=add_ingredient_form.vars.type)
 
 		# grab all ingredients that are not the newly inserted
-		other_ingredients = db(db.ingredients.id!=new_ingredient_id).select()
+		#other_ingredients = db(db.ingredients.id!=new_ingredient_id).select()
 		# add a relation to each other ingredients
-		if other_ingredients != None:
-			for each_ingredient in other_ingredients:
-				db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id)
-			
+		#if other_ingredients != None:
+		#	for each_ingredient in other_ingredients:
+		#		db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id)
+	else:
+		response.flash=T('Meow')
 	return dict(add_ingredient_form=add_ingredient_form)
  
 def recommend():

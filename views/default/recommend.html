@@ -1,18 +1,18 @@
 {{extend 'layout.html'}}
 <h1>Try some lovely ingredients!</h1>
-<h2>You want to make some delicious foods using these ingredients:</h2>
+<h4>You want to make some delicious foods using these ingredients:</h4>
 <div id=chosen_ingredients>
 {{for each_ingredient in ingredient_names_in_combo:}}
 {{=DIV(each_ingredient.name, _id='chosen_ing_'+each_ingredient.name, _class='chosen_ingredient')}}
 {{pass}}
 </div>
-<h2>Try these recommendations </h2>
+<h4>Try these recommendations </h4>
 <div id=simple_rec_ingredients>
 {{for each_recommendation in simple_rec_ingredients:}}
 {{=DIV(each_recommendation.other_ingredient.name, _id='simple_rec_'+each_recommendation.other_ingredient.name, _class='simple_rec_ingredient')}}
 {{pass}}
 </div>
-<h2>Or these recommendations </h2>
+<h4>Or these recommendations </h4>
 <div id=complex_rec_ingredients>
 {{for each_recommendation in complex2_rec_ingredients:}}
 {{=DIV(each_recommendation, _id='complex_rec_'+each_recommendation, _class='complex_rec_ingredient')}}
