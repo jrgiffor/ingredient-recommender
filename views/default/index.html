@@ -20,7 +20,7 @@
     <title>Find delicious ingredients!</title>
 	
 	<style type="text/css">
-    <!--
+
 	body {
 		color:black;
 		background-color: #FFFFD6;
@@ -124,7 +124,7 @@
         height:5%;
         border:1px solid #999999;
     }
-    //-->
+
     </style>
 	
     <script type="text/javascript" src="{{=URL(r=request,c='static',f='jquery.js')}}"></script>
@@ -208,9 +208,9 @@
 			ingredientList += ',';
 		}
 		$.post("{{=URL(r=request,f='createcombination')}}",{ingredientList:ingredientList},function(result){
-			window.navigate("recommend.html");
+		
         });
-		alert ("Current ingredient list " + ingredientList);		
+		 window.location.href = "recommend.html"	
 		return false; 
 	  });  
 	}); 
