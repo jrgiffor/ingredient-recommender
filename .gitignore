@@ -1,10 +1,5 @@
 $ Specific web2py directories
-/private
-/sessions
-/cron
 /errors
-/cache
-/databases
 
 # Generated code
 *.pyc
