@@ -1,20 +1,43 @@
 {{extend 'layout.html'}}
+<head>
+
+	<style type="text/css">
+        body{
+            background-color:#424242;
+            color:white;
+        }
+        #simple_rec_ingredients{
+            color:red;    
+            font-size:25px;
+        }
+    </style>
+</head>
+<body>
 <h1>Try some lovely ingredients!</h1>
-<h2>You want to make some delicious foods using these ingredients:</h2>
 <div id=chosen_ingredients>
+<h2>You want to make some delicious foods using these ingredients:</h2>
+
 {{for each_ingredient in ingredient_names_in_combo:}}
 {{=DIV(each_ingredient.name, _id='chosen_ing_'+each_ingredient.name, _class='chosen_ingredient')}}
 {{pass}}
 </div>
-<h2>Try these recommendations </h2>
 <div id=simple_rec_ingredients>
+<h3>Try these recommendations </h3>
+
 {{for each_recommendation in simple_rec_ingredients:}}
 {{=DIV(each_recommendation.other_ingredient.name, _id='simple_rec_'+each_recommendation.other_ingredient.name, _class='simple_rec_ingredient')}}
 {{pass}}
 </div>
-<h2>Or these recommendations </h2>
+<h3>Or these recommendations </h3>
 <div id=complex_rec_ingredients>
 {{for each_recommendation in complex2_rec_ingredients:}}
 {{=DIV(each_recommendation, _id='complex_rec_'+each_recommendation, _class='complex_rec_ingredient')}}
 {{pass}}
 </div>
+<div id="soundsgood">
+    <input type="button" value="Sounds Good!"></input>
+    </div>
+<div id="nah">
+    <input type="button" value="Nah ->"></input>
+</div>
+</body>
