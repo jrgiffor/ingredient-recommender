@@ -109,7 +109,14 @@ def recommend():
 	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
 
 	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex_rec_ingredients=top_ingredients)
-		
+	
+# create a function to accept input from the recommendations page. This will be ajax and should return true 
+def recieve_rating():
+	# this function will set ingredient_weighted_value.value for each ingredient in the combo and the ingredient "chosen" (clicked on)
+	
+	# it will return true to let the recommendation page change the view
+	return True
+	
  
 def ingredients():
 	ingredients = db(db.ingredients).select()
