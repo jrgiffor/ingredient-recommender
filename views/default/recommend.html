@@ -1,4 +1,18 @@
 {{extend 'layout.html'}}
+<head>
+
+	<style type="text/css">
+        body{
+            background-color:#424242;
+            color:white;
+        }
+        #simple_rec_ingredients{
+            color:red;    
+            font-size:25px;
+        }
+    </style>
+</head>
+<body>
 <h1>Try some lovely ingredients!</h1>
 <h4>You want to make some delicious foods using these ingredients:</h4>
 <div id=chosen_ingredients>
@@ -18,3 +32,10 @@
 {{=DIV(each_recommendation, _id='complex_rec_'+each_recommendation, _class='complex_rec_ingredient')}}
 {{pass}}
 </div>
+<div id="soundsgood">
+    <input type="button" value="Sounds Good!"></input>
+    </div>
+<div id="nah">
+    <input type="button" value="Nah ->"></input>
+</div>
+</body>
