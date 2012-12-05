@@ -60,8 +60,9 @@ def addingredient():
 		# grab all ingredients that are not the newly inserted
 		other_ingredients = db(db.ingredients.id!=new_ingredient_id).select()
 		# add a relation to each other ingredients
-		for each_ingredient in other_ingredients:
-			db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id)
+		if other_ingredients != None:
+			for each_ingredient in other_ingredients:
+				db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id)
 			
 	return dict(add_ingredient_form=add_ingredient_form)
  
@@ -99,7 +100,7 @@ def recommend():
 		#	response.flash=T(str(ongoing_value))
 		#	compute_value[each_ingredient.other_ingredient.name] = sqrt(pow(ongoing_value, 2) + pow(float(db.ingredients_weighted_value.value.avg)(), 2))
 		else:
-			compute_value[each_ingredient.other_ingredient.name] = 1 #each_ingredient.ingredients_weighted_value
+			compute_value[each_ingredient.other_ingredient.name] = 1 #each_ingredient.value.avg()
 	
 	sorted_recommendations = sorted(compute_value.iteritems(), key=operator.itemgetter(1))
 	top_ingredients = []
