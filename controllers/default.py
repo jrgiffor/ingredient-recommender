@@ -106,8 +106,8 @@ def recommend():
 	sorted_recommendations = sorted(compute_value.iteritems(), key=operator.itemgetter(1))
 	top_ingredients = []
 	# this will grab the top three ingredients
-	for index in range(3):
-		top_ingredients.append(sorted_recommendations[index][0])
+	#for index in range(3):
+	#	top_ingredients.append(sorted_recommendations[index][0])
 		
 	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
 	# , complex_rec_ingredients=top_ingredients
