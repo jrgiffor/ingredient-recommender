@@ -1,5 +1,6 @@
 $ Specific web2py directories
 /errors
+/sessions
 
 # Generated code
 *.pyc

@@ -61,7 +61,7 @@ def addingredient():
 		# add a relation to each other ingredients
 		if other_ingredients != None:		
 			for each_ingredient in other_ingredients:
-				db.ingredients_weighted_value.insert(ingredientId1=add_ingredient_form.vars.id,ingredientId2=each_ingredient.id)
+				db.ingredients_weighted_value.insert(ingredientId1=add_ingredient_form.vars.id,ingredientId2=each_ingredient.id, value=0.5)
 	else:
 		response.flash=T('Meow')
 	return dict(add_ingredient_form=add_ingredient_form)
@@ -105,8 +105,8 @@ def recommend():
 	sorted_recommendations = sorted(compute_value.iteritems(), key=operator.itemgetter(1))
 	top_ingredients = []
 	# this will grab the top three ingredients
-	#for index in range(3):
-	#	top_ingredients.append(sorted_recommendations[index][0])
+	for index in range(3):
+		top_ingredients.append(sorted_recommendations[index][0])
 		
 	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
 	# , complex_rec_ingredients=top_ingredients
