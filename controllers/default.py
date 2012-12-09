@@ -24,8 +24,9 @@ def index():
 def createcombination():
 	ingredient_input = request.vars.values()[0]
 	ingredient_output = ''
-	
 	ingredient_list = ingredient_input.split(',')
+	# Delete the previous combination if making a new one unless they log in
+	
 	combinationid = db.combinations.insert(name="temp")
 	session.comboId = combinationid
 	for each_ingredient in ingredient_list:
@@ -53,16 +54,14 @@ def ajaxlivesearch():
 # for some reason, adds a copy of each ingredient as well
 def addingredient():
 	add_ingredient_form = SQLFORM(db.ingredients)
+	# this adds the ingredient automatically and stores it in form.vars.id
 	if add_ingredient_form.process().accepted:
-		# add a new ingredient to the db
-		new_ingredient_id = db.ingredients.insert(name=add_ingredient_form.vars.name, type=add_ingredient_form.vars.type)
-
 		# grab all ingredients that are not the newly inserted
-		#other_ingredients = db(db.ingredients.id!=new_ingredient_id).select()
+		other_ingredients = db(db.ingredients.id!=add_ingredient_form.vars.id).select()
 		# add a relation to each other ingredients
-		#if other_ingredients != None:
-		#	for each_ingredient in other_ingredients:
-		#		db.ingredients_weighted_value.insert(ingredientId1=new_ingredient_id,ingredientId2=each_ingredient.id)
+		if other_ingredients != None:		
+			for each_ingredient in other_ingredients:
+				db.ingredients_weighted_value.insert(ingredientId1=add_ingredient_form.vars.id,ingredientId2=each_ingredient.id)
 	else:
 		response.flash=T('Meow')
 	return dict(add_ingredient_form=add_ingredient_form)
