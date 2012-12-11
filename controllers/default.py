@@ -51,7 +51,6 @@ def ajaxlivesearch():
 
     return TAG[''](*items)
   
-# for some reason, adds a copy of each ingredient as well
 def addingredient():
 	add_ingredient_form = SQLFORM(db.ingredients)
 	# this adds the ingredient automatically and stores it in form.vars.id
@@ -66,6 +65,38 @@ def addingredient():
 		response.flash=T('Meow')
 	return dict(add_ingredient_form=add_ingredient_form)
  
+# this is a back end function that will add a cooking method for each ingredient
+def addcookingmethod():
+	ingredients = db().select(db.ingredients.ALL)
+	components = [LI(INPUT(_name=i.name, _type="checkbox"), i.name) for i in ingredients]
+	form=FORM(INPUT(_name='name', requires=IS_NOT_EMPTY()), INPUT(_type="submit"), 
+              *components,
+              _method="post", _action="")
+			  
+	if form.accepts(request, session):
+		response.flash=T(str(request.vars))
+		cooking_method = request.vars.name
+		for each_key in request.vars.keys():
+			the_ingredient = ingredients.find(lambda ingredient: ingredient.name==each_key).first()
+			if the_ingredient != None:
+				already_inside = (db.cooking_methods.method==cooking_method) & (db.cooking_methods.ingredientId==the_ingredient.id)
+				if not db(already_inside).select():
+					db.cooking_methods.insert(method=request.vars.name,ingredientId=the_ingredient.id, value=0.5)
+	else:
+		response.flash=T('Please enter a cooking method and select all relevant ingredients.')		
+		#response.flash=T('fail ' + str(request.vars))
+	return dict(form=form)
+
+
+# alternative recommend to the ingredients - based on cooking style
+	# find all cooking_methods that are used to cook a chosen ingredient
+	# sort them by the most common
+	# recommend the cooking_method 
+	# recommend other ingredients in that cooking_method to the user sorted by highest rating
+	
+	# perhaps offer some additional ingredients not dependent on cooking style
+
+
 def recommend():
 	total_group_of_edges = None
 	# grab all the ingredients in the combo

@@ -25,11 +25,11 @@ db.define_table('ingredients_in_combination',
     Field('combinationId', 'reference combinations', readable=False), 
     )    
  
- 
-#db.define_table('cooking_method',
-#    Field('method', 'string', length=64), 
-#    Field('combinationId', 'references combination'), 
-#    )   
+db.define_table('cooking_methods',
+    Field('method', 'string', length=64), 
+    Field('ingredientId',  'reference ingredients'),
+	Field('value', 'double'),
+    )   
 
 db.define_table('ingredients_weighted_value',
     Field('ingredientId1',  'reference ingredients'), 
