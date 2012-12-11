@@ -1,0 +1,114 @@
+body {
+
+		//background-color: #FFFFD6;
+		background-image:url('../images/ingredients/pattern.png');
+		background-repeat:repeat;
+		font-family: 'Arial', serif;
+		font-size: 18px;
+		color:#1A1A1A
+		text-align: center;
+	}
+	h1{
+		font-size: 50px;
+		text-align: center;
+	}
+	h3{
+            font-family: 'Arial', serif;
+	}
+	a{
+		color:#000000;
+	}
+	a:visited{
+		color:#D8D8D8;
+	}
+
+
+	#ingredientsbox{		
+		background-color:#F1F1F1;
+		width:50%;
+		height:35%;
+		top:25%;
+		left:25%;
+		position: fixed;
+		border: 1px;
+		border-style: solid;
+		border-color: #E8E8E8;
+		border-radius: 5px 5x 5px 5px;
+	}
+	#listingredientsbox{
+		width:40%;
+		height:70%;
+		top:10%;
+		left:55%;
+		position: relative;
+		border: 1px;
+		border-style: solid;
+		border-color: black;
+	}
+	
+	#recommend{
+		background-color:#47B5FF;
+		position: fixed;
+		top:65%;
+		left:25%;
+		height:7.5%;
+		width:50%;
+		border: 2px;
+		border-style: solid;
+		border-color: black;
+		border-radius: 15px 15px 15px 15px;		
+		text-align: center;	
+	}
+	#delete_ingredients {
+		position: fixed;
+		top:55%;
+	}
+	.ingredient {  
+		color:red; 
+		margin:5px; 
+		cursor:pointer; 
+	}
+	.ingredient:hover { background:yellow; }
+	}
+	ul{
+		list-style-type: none;
+		margin-left: 0px;
+		padding: 5px;
+	}
+    #ajaxresults{
+        background: #ffffff;
+        padding: 5px 10px;
+        max-height: 400px;
+        overflow: auto;
+        position: absolute;
+        z-index: 99;
+        border: 1px solid #A9A9A9;
+        border-width: 0 1px 1px 1px;
+        -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+        -box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+    }
+    #ajaxresults a{
+        color:#666666;
+    }
+    input[type=text]{
+        font-size:12px;
+        color:#666666;
+        background-color:#ffffff;
+        padding: 5px 5px 5px 5px;
+		position: relative;
+        max-width:300px;
+        height:5%;
+        border:1px solid #999999;
+		margin-right: 15px;
+		margin-left: 15px;
+		margin-top:8px;
+    }
+	
+	#recommendsubmit {
+	position:relative;
+	position:absolute;
+	bottom:5px;
+	left: 50%;
+	margin-left: -47.5px;
+	}
