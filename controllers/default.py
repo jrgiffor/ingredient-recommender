@@ -94,7 +94,11 @@ def addcookingmethod():
 		response.flash=T('Please enter a cooking method and select all relevant ingredients.')		
 		#response.flash=T('fail ' + str(request.vars))
 	return dict(form=form)
-
+	
+def nextrecommendation():
+	session.recommendation_number = session.recommendation_number + 1
+	redirect(URL('recommendfun'))
+	
 # alternative recommend to the ingredients - based on cooking style
 def recommendfun():
 	#app_logging.info('\n\nEntering recommendfun')
@@ -223,55 +227,8 @@ def recommendfun():
 		
 		# Have to figure out something to do
 	cooking_methods_of_chosen_ingredients
-	session.recommendation_number = recommendation_number + 1
 	#app_logging.info('Leaving recommendfun')
 	return dict(ingredient_names_in_combo=the_chosen_ingredients,cooking_methods_of_chosen_ingredients=cooking_methods_of_chosen_ingredients, recommendations=recommendations)
-	
-def recommend():
-	total_group_of_edges = None
-	# grab all the ingredients in the combo
-	find_ingredients_query = db.ingredients_in_combination.combinationId == session.comboId
-	find_ingredients_query &= db.ingredients_in_combination.ingredientId == db.ingredients.id
-	ingredients_in_combo = db(find_ingredients_query).select(db.ingredients.id)
-	ingredient_names_in_combo = db(find_ingredients_query).select(db.ingredients.name, db.ingredients.type)
-	# select all ingredient relations that have only one ingredient in the combo
-	chosen_ingredient = db.ingredients.with_alias('chosen_ingredient')
-	other_ingredient  = db.ingredients.with_alias('other_ingredient')
-	
-	# grab all ingredients related to the one chosen
-	ingredient_name_query =  (chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
-	ingredient_name_query |= (chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
-	
-	# BAD
-	# ingredient_name_query =  chosen_ingredient.id.belongs(ingredients_in_combo)
-	# ingredient_name_query &= ~other_ingredient.id.belongs(ingredients_in_combo)
-	
-	# let this save the value of the computed "closest distance"
-	compute_value = {}
-	# things to do to improve complex_rec_ingredients:
-	# take the "closest distance" for all the ingredients. 
-	# let val(ingredient1, ingredient2) stand for the AVG value of all ingredient1-ingredient2, value pairings
-	# and "closest distance" would be sqrt(val(ingredient1,ingredientK)^2 + val(ingredient2,ingredientK)^2 + ... + val(ingredientN,ingredientK)^2)
-	# for example for the ingredient pairings: beef-bell pepper and beef-onion, 
-	#	"closest distance" ranking for beef would be sqrt(val(beef, bell pepper)^2 + val(beef, onion)^2)
-	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg().with_alias('AVG_ing_value'), groupby=chosen_ingredient.name|other_ingredient.name)
-	for each_ingredient in complex_rec_ingredients:
-		if each_ingredient.other_ingredient.name in compute_value:
-			ongoing_value = compute_value[each_ingredient.other_ingredient.name]
-			#response.flash=T(str(ongoing_value))
-			compute_value[each_ingredient.other_ingredient.name] = sqrt(pow(ongoing_value, 2) + pow(each_ingredient.AVG_ing_value, 2))
-		else:
-			compute_value[each_ingredient.other_ingredient.name] = each_ingredient.AVG_ing_value
-	
-	sorted_recommendations = sorted(compute_value.iteritems(), key=operator.itemgetter(1))
-	top_ingredients = []
-	# this will grab the top three ingredients
-	for index in range(max(3,len(sorted_recommendations))):
-		top_ingredients.append(sorted_recommendations[index][0])
-		
-	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
-	# , complex_rec_ingredients=top_ingredients
-	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex2_rec_ingredients=top_ingredients)
 	
 # create a function to accept input from the recommendations page. This will be ajax and should return true 
 def recieve_rating():
