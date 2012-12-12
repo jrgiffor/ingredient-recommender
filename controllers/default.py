@@ -14,6 +14,22 @@ from gluon.tools import Crud
 from math import sqrt
 import time
 import operator
+import copy
+
+def _init_log():
+    import os,logging,logging.handlers,time 
+    logger = logging.getLogger(request.application) 
+    logger.setLevel(logging.INFO) 
+    handler = logging.handlers.RotatingFileHandler(os.path.join(
+        request.folder,'logs','applog.log'),'a',1024*1024,1) 
+    handler.setLevel(logging.INFO) #or DEBUG
+    handler.setFormatter(logging.Formatter( 
+        '%(asctime)s %(levelname)s %(filename)s %(lineno)d %(funcName)s(): %(message)s')) 
+    logger.addHandler(handler) 
+    return logger
+    
+app_logging = cache.ram('app_wide_log',lambda:_init_log(),time_expire=None)
+
 
 def index():
 
@@ -81,6 +97,7 @@ def addcookingmethod():
 
 # alternative recommend to the ingredients - based on cooking style
 def recommendfun():
+	#app_logging.info('\n\nEntering recommendfun')
 	## SKETCHY QUERYING:
 	## - find_ingredients_query happens twice
 	##   - can possibly combine find_ingredients_query and find_cooking_methods
@@ -102,9 +119,15 @@ def recommendfun():
 	## The goal here is to create a list of cooking recommendations.
 	## Each cooking recommendation consists of a [cooking method, the ingredients chosen with that cooking method, and the ingredients recommended] 
 	
-	# let unused stand for every ingredient in the combo not being recommended
+	# let unused stand for every ingredient in the chosen combination not currently being used
 	unused = ingredients_in_combo
-	# this is the data passed to the front end. It will be a list of tuples [CM name, list_of_ingredients]
+	
+	## DEBUGGING
+	the_chosen_ingredients = ingredients_in_combo.as_list()
+	##
+	
+	#response.flash=T(str(unused.first()))
+	# this is the data passed to the front end. It will be a list of tuples [CM name, list_of_ingredients, list_of_recommendations]
 	recommendations = []
 	for each_cooking_method in cooking_methods_of_chosen_ingredients:
 		# chosen_ingredient_list are the ingredients that are a part of this CM
@@ -112,11 +135,17 @@ def recommendfun():
 		
 		# Save the names of the ingredients in a list
 		chosen_ingredient_list = []
+		#app_logging.info('Choosing ingredients for the cooking method: ' + str(each_cooking_method.cooking_methods.method))
+		#app_logging.info('Chosen_ingredients: ' + str(chosen_ingredients))
 		for each_chosen_ingredient in chosen_ingredients:
 			# make sure that the ingredient is unused
-			if unused.find(lambda ingredients: ingredients.name == each_chosen_ingredient.name) != None:
+			#app_logging.info('Current ingredient ' + str(each_chosen_ingredient.name))
+			#app_logging.info('Unused: ' + str(unused))
+			unused_ingredient = unused.find(lambda ingredients: ingredients.name == each_chosen_ingredient.name)
+			if unused_ingredient.first() != None:
+				#app_logging.info('Chose ' + str(unused_ingredient.first().name))
 				chosen_ingredient_list.insert(0, each_chosen_ingredient.name)
-				unused = unused.exclude(lambda ingredients: ingredients.name==each_chosen_ingredient.name)
+				unused = unused.exclude(lambda ingredients: ingredients.name!=each_chosen_ingredient.name)
 			
 
 		## Method of recommendation:
@@ -133,7 +162,7 @@ def recommendfun():
 			ingredient_name_query |= (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
 			recommended_ingredients = db((each_cooking_method.cooking_methods.method==db.cooking_methods.method) & (db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
 			#recommended_ingredients = db(ingredient_name_query).select(each_chosen_ingredient.id, other_ingredient.name)
-			response.flash=T(str(recommended_ingredients))
+			#response.flash=T(str(recommended_ingredients))
 			for each_recommended_ingredient in recommended_ingredients:
 				# a little hack. this needs more work
 				found = False
@@ -149,15 +178,16 @@ def recommendfun():
 		#unused = unused.exclude(lambda ingredients: ingredients.id
 		
 		recommendations.append(recommendation)
-	# do something with the unused ingredients
-	## making a recommendation
-	# grab all ingredients
-	# find the AVG(value) of each ingredient pairing
-	# sort by the value
-	# limit by the top 3 results 
+		
+		#response.flash=T(str(unused))
+		# end the loop if all the ingredients are used
+		if unused.first() == None:
+			#response.flash=T('Unused is empty')
+			break
 	
 	# perhaps offer some additional ingredients not dependent on cooking style
-	return dict(ingredient_names_in_combo=ingredients_in_combo,cooking_methods_of_chosen_ingredients=cooking_methods_of_chosen_ingredients, recommendations=recommendations)
+	#app_logging.info('Leaving recommendfun')
+	return dict(ingredient_names_in_combo=the_chosen_ingredients,cooking_methods_of_chosen_ingredients=cooking_methods_of_chosen_ingredients, recommendations=recommendations)
 	
 def recommend():
 	total_group_of_edges = None
