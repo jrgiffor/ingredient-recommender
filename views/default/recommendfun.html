@@ -3,31 +3,32 @@
 
 	<style type="text/css">
         body{
-            background-color:#424242;
-            color:white;
+            background-image:url('../static/images/ingredients/pattern.png');
+			background-repeat:repeat;
+			font-family: 'Arial', serif;
+			font-size: 18px;
+			color:#1A1A1A
+			text-align: center;
         }
         #simple_rec_ingredients{
+       
             color:red;    
             font-size:25px;
+        }
+        #chosen_ingredients{
+                background-color:white;
+            padding: 5px;
+            
         }
     </style>
 </head>
 <body>
 <h1>Try some lovely ingredients!</h1>
-<h4>You want to make some delicious foods using these ingredients:</h4>
 <div id=chosen_ingredients>
-{{=ingredient_names_in_combo}}
-{{#for each_ingredient in ingredient_names_in_combo:}}
-{{#=DIV(each_ingredient.name, _id='chosen_ing_'+each_ingredient.name, _class='chosen_ingredient')}}
-{{#pass}}
+    {{for rec in recommendations:}}<h4>{{=rec[0]}} these ingredients!</h4>{{for item in rec[1]:}}{{=item}}{{pass}}{{pass}}
+   
 </div>
-<h4>Different ways to cook: </h4>
-<div id=cooking_methods_of_chosen_ingredients>
-{{=cooking_methods_of_chosen_ingredients}}
-<h4>Or these recommendations </h4>
-<div id=complex_rec_ingredients>
-{{=recommendations}}
-</div>
+
 <div id="soundsgood">
     <input type="button" value="Sounds Good!"></input>
     </div>
