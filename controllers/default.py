@@ -45,6 +45,7 @@ def createcombination():
 	
 	combinationid = db.combinations.insert(name="temp")
 	session.comboId = combinationid
+	session.recommendation_number = 0
 	for each_ingredient in ingredient_list:
 		full_ingredient = db(db.ingredients.name.lower() == str(each_ingredient).lower()).select().first()
 		if full_ingredient != None:
@@ -94,7 +95,6 @@ def addcookingmethod():
 		#response.flash=T('fail ' + str(request.vars))
 	return dict(form=form)
 
-
 # alternative recommend to the ingredients - based on cooking style
 def recommendfun():
 	#app_logging.info('\n\nEntering recommendfun')
@@ -108,6 +108,11 @@ def recommendfun():
 	find_ingredients_query &= db.ingredients_in_combination.ingredientId == db.ingredients.id
 	ingredients_in_combo = db(find_ingredients_query).select(db.ingredients.ALL)
 	## REMOVE FOR PERFORMANCE
+	
+	## This function should now look at the session variable: recommendation_number
+	if session.recommendation_number == None:
+		session.recommendation_number = 0
+	recommendation_number = session.recommendation_number
 	
 	# find all cooking_methods that are used to cook a chosen ingredient
 	find_cooking_methods = (db.cooking_methods.ingredientId == db.ingredients.id) & (db.cooking_methods.value == 0.5)
@@ -129,10 +134,17 @@ def recommendfun():
 	#response.flash=T(str(unused.first()))
 	# this is the data passed to the front end. It will be a list of tuples [CM name, list_of_ingredients, list_of_recommendations]
 	recommendations = []
-	for each_cooking_method in cooking_methods_of_chosen_ingredients:
+	for index in range(len(cooking_methods_of_chosen_ingredients)):
+		each_cooking_method = cooking_methods_of_chosen_ingredients[index]
+		
+		# this forces the recommendations to ignore the major cooking methods
+		if index < recommendation_number:
+			continue
+		
 		# chosen_ingredient_list are the ingredients that are a part of this CM
 		chosen_ingredients = db((each_cooking_method.cooking_methods.method==db.cooking_methods.method) & (db.cooking_methods.ingredientId==db.ingredients.id) & (find_ingredients_query)).select(db.ingredients.ALL)
 		
+		nothing_free = True
 		# Save the names of the ingredients in a list
 		chosen_ingredient_list = []
 		#app_logging.info('Choosing ingredients for the cooking method: ' + str(each_cooking_method.cooking_methods.method))
@@ -146,8 +158,12 @@ def recommendfun():
 				#app_logging.info('Chose ' + str(unused_ingredient.first().name))
 				chosen_ingredient_list.insert(0, each_chosen_ingredient.name)
 				unused = unused.exclude(lambda ingredients: ingredients.name!=each_chosen_ingredient.name)
+				nothing_free = False
+		
+		# Skip over this cooking method if there are no free ingredients
+		if nothing_free:
+			continue
 			
-
 		## Method of recommendation:
 		## look through each ingredient chosen
 		recommend_ingredient_list = []
@@ -175,17 +191,39 @@ def recommendfun():
 		# recommend_ingredient_list are the ingredients that are to be recommended		
 		# recommendation.insert(0, [ CM.name, ingredient_list ])
 		recommendation = [each_cooking_method.cooking_methods.method, chosen_ingredient_list, recommend_ingredient_list]
-		#unused = unused.exclude(lambda ingredients: ingredients.id
-		
 		recommendations.append(recommendation)
 		
-		#response.flash=T(str(unused))
 		# end the loop if all the ingredients are used
 		if unused.first() == None:
-			#response.flash=T('Unused is empty')
 			break
 	
-	# perhaps offer some additional ingredients not dependent on cooking style
+	# if there are ingredients not in a cooking method
+	if unused.first() != None:
+		chosen_ingredient_list = []
+		recommend_ingredient_list = []
+		for each_chosen_ingredient in unused:
+			chosen_ingredient_list.insert(0, each_chosen_ingredient.name)
+			
+			## This looks through all ingredients that are related to the ingredient in question
+			other_ingredient  = db.ingredients.with_alias('other_ingredient')
+			ingredient_name_query =  (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
+			ingredient_name_query |= (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
+			recommended_ingredients = db((db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
+			for each_recommended_ingredient in recommended_ingredients:
+				# a little hack. this needs more work
+				found = False
+				for each_ingredient in recommend_ingredient_list:
+					if each_ingredient == each_recommended_ingredient.other_ingredient.name:
+						found = True
+				if found == False:
+					recommend_ingredient_list.insert(0, each_recommended_ingredient.other_ingredient.name)
+		
+		recommendation = ['You can also add in', chosen_ingredient_list, recommend_ingredient_list]
+		recommendations.append(recommendation)
+		
+		# Have to figure out something to do
+	cooking_methods_of_chosen_ingredients
+	session.recommendation_number = recommendation_number + 1
 	#app_logging.info('Leaving recommendfun')
 	return dict(ingredient_names_in_combo=the_chosen_ingredients,cooking_methods_of_chosen_ingredients=cooking_methods_of_chosen_ingredients, recommendations=recommendations)
 	
