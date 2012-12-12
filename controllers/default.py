@@ -101,6 +101,7 @@ def recommendfun():
 	## choosing the cooking style
 	## The goal here is to create a list of cooking recommendations.
 	## Each cooking recommendation consists of a [cooking method, the ingredients chosen with that cooking method, and the ingredients recommended] 
+	
 	# let unused stand for every ingredient in the combo not being recommended
 	unused = ingredients_in_combo
 	# this is the data passed to the front end. It will be a list of tuples [CM name, list_of_ingredients]
@@ -108,30 +109,44 @@ def recommendfun():
 	for each_cooking_method in cooking_methods_of_chosen_ingredients:
 		# chosen_ingredient_list are the ingredients that are a part of this CM
 		chosen_ingredients = db((each_cooking_method.cooking_methods.method==db.cooking_methods.method) & (db.cooking_methods.ingredientId==db.ingredients.id) & (find_ingredients_query)).select(db.ingredients.ALL)
+		
 		# Save the names of the ingredients in a list
 		chosen_ingredient_list = []
 		for each_chosen_ingredient in chosen_ingredients:
-			chosen_ingredient_list.insert(0, each_chosen_ingredient.name)
+			# make sure that the ingredient is unused
+			if unused.find(lambda ingredients: ingredients.name == each_chosen_ingredient.name) != None:
+				chosen_ingredient_list.insert(0, each_chosen_ingredient.name)
+				unused = unused.exclude(lambda ingredients: ingredients.name==each_chosen_ingredient.name)
 			
-		# recomd_ingredient_list are the ingredients that are to be recommended
+
 		## Method of recommendation:
 		## look through each ingredient chosen
-		possible_ingredients = []
+		recommend_ingredient_list = []
 		## There is a choice here:
 		## Use a for loop to go through all of the chosen ingredients
 		## OR
 		## Create a massive query that includes the chosen ingredients query
-		for each_ingredient in chosen_ingredients:
+		for each_chosen_ingredient in chosen_ingredients:
 			## This looks through all ingredients that are related to the ingredient in question
 			other_ingredient  = db.ingredients.with_alias('other_ingredient')
-			ingredient_name_query =  (each_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
-			ingredient_name_query |= (each_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
-			recommended_ingredients = db(ingredient_name_query).select(other_ingredient.name)
+			ingredient_name_query =  (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
+			ingredient_name_query |= (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
+			recommended_ingredients = db((each_cooking_method.cooking_methods.method==db.cooking_methods.method) & (db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
+			#recommended_ingredients = db(ingredient_name_query).select(each_chosen_ingredient.id, other_ingredient.name)
+			response.flash=T(str(recommended_ingredients))
+			for each_recommended_ingredient in recommended_ingredients:
+				# a little hack. this needs more work
+				found = False
+				for each_ingredient in recommend_ingredient_list:
+					if each_ingredient == each_recommended_ingredient.other_ingredient.name:
+						found = True
+				if found == False:
+					recommend_ingredient_list.insert(0, each_recommended_ingredient.other_ingredient.name)
 			
-		recomd_ingredient_list = []
+		# recommend_ingredient_list are the ingredients that are to be recommended		
 		# recommendation.insert(0, [ CM.name, ingredient_list ])
-		recommendation = [each_cooking_method.cooking_methods.method, chosen_ingredient_list, recomd_ingredient_list]
-		#unused = unused.exclude(lambda ingredients: chosen 
+		recommendation = [each_cooking_method.cooking_methods.method, chosen_ingredient_list, recommend_ingredient_list]
+		#unused = unused.exclude(lambda ingredients: ingredients.id
 		
 		recommendations.append(recommendation)
 	# do something with the unused ingredients
