@@ -1,6 +1,4 @@
 body {
-
-		//background-color: #FFFFD6;
 		background-image:url('../images/ingredients/pattern.png');
 		background-repeat:repeat;
 		font-family: 'Arial', serif;
@@ -12,8 +10,11 @@ body {
 		font-size: 50px;
 		text-align: center;
 	}
+	h2{
+		
+	}
 	h3{
-            font-family: 'Arial', serif;
+        font-family: 'Arial', serif;
 	}
 	a{
 		color:#000000;
@@ -112,3 +113,12 @@ body {
 	left: 50%;
 	margin-left: -47.5px;
 	}
+	#recommended{
+		background-color:#F1F1F1;
+    	border: 1px;
+		border-style: solid;
+		border-color: #E8E8E8;
+		border-radius: 5px 5x 5px 5px;
+    	width:50%;
+    	
+    }

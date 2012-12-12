@@ -1,33 +1,13 @@
 {{extend 'layout.html'}}
 <head>
-
-	<style type="text/css">
-        body{
-            background-color:#424242;
-            color:white;
-        }
-        #simple_rec_ingredients{
-            color:red;    
-            font-size:25px;
-        }
-    </style>
+	<link rel="stylesheet" href="{{=URL('static','css/ingredientstyle.css')}}">
 </head>
 <body>
-<h1>Try some lovely ingredients!</h1>
-<h4>You want to make some delicious foods using these ingredients:</h4>
-<div id=chosen_ingredients>
-{{=ingredient_names_in_combo}}
-{{#for each_ingredient in ingredient_names_in_combo:}}
-{{#=DIV(each_ingredient.name, _id='chosen_ing_'+each_ingredient.name, _class='chosen_ingredient')}}
-{{#pass}}
+<h2>Try some lovely ingredients!</h2>
+<div id="recommended">
+    {{for rec in recommendations:}}<h4>{{=rec[0]}} these ingredients!</h4>{{for item in rec[1]:}}{{=item}}<br/>{{pass}}{{pass}}
 </div>
-<h4>Different ways to cook: </h4>
-<div id=cooking_methods_of_chosen_ingredients>
-{{=cooking_methods_of_chosen_ingredients}}
-<h4>Or these recommendations </h4>
-<div id=complex_rec_ingredients>
-{{=recommendations}}
-</div>
+
 <div id="soundsgood">
     <input type="button" value="Sounds Good!"></input>
     </div>
