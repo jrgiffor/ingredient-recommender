@@ -1,32 +1,11 @@
 {{extend 'layout.html'}}
 <head>
-
-	<style type="text/css">
-        body{
-            background-image:url('../static/images/ingredients/pattern.png');
-			background-repeat:repeat;
-			font-family: 'Arial', serif;
-			font-size: 18px;
-			color:#1A1A1A
-			text-align: center;
-        }
-        #simple_rec_ingredients{
-       
-            color:red;    
-            font-size:25px;
-        }
-        #chosen_ingredients{
-                background-color:white;
-            padding: 5px;
-            
-        }
-    </style>
+	<link rel="stylesheet" href="{{=URL('static','css/ingredientstyle.css')}}">
 </head>
 <body>
-<h1>Try some lovely ingredients!</h1>
-<div id=chosen_ingredients>
-    {{for rec in recommendations:}}<h4>{{=rec[0]}} these ingredients!</h4>{{for item in rec[1]:}}{{=item}}{{pass}}{{pass}}
-   
+<h2>Try some lovely ingredients!</h2>
+<div id="recommended">
+    {{for rec in recommendations:}}<h4>{{=rec[0]}} these ingredients!</h4>{{for item in rec[1]:}}{{=item}}<br/>{{pass}}{{pass}}
 </div>
 
 <div id="soundsgood">
