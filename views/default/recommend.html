@@ -7,6 +7,14 @@
 	
 	$(function() {  
 	  $('.error').hide();
+	  $("#mp_btn").click(function() {  
+		window.location.href = "index.html";
+		return false; 
+	  });  
+	});
+	
+	$(function() {  
+	  $('.error').hide();
 	  $("#next_btn").click(function() {  
 		$('.error').hide();
 		$.post("{{=URL(r=request,f='nextrecommendation')}}",{},function(result){
@@ -47,10 +55,12 @@
 
 		}
 		$.post("{{=URL(r=request,f='successfulrecommendation')}}",{ingredientList:ingredientList},function(result){
-			alert(result);
+			//alert(result);
+			this.remove();
 			//window.location.href = "recommend.html";
         });
 		return false; 
+
 	  });  
 	}); 	
     </script>
@@ -84,12 +94,16 @@
     <br/>
     <br/>
     
-<div id="success_btn_area">
-	<form><input type="submit" class="button" id="success_btn" value="Sounds Good!" /></form>
+	<div id="success_btn_area">
+		<form><input type="submit" class="button" id="success_btn" value="Sounds Good!" /></form>
+	</div>
+	<div id="next_btn_area">
+		<form><input type="submit" class="button" id="next_btn" value="Next" /></form>
+		{{#=A('Next', callback=URL(r=request,f='nextrecommendation'))}}
+	</div>
+	<div id="mp_btn_area">
+		<form><input type="submit" class="button" id="mp_btn" value="Choose Different Ingredients!" /></form>
+		{{#=A('Next', callback=URL(r=request,f='nextrecommendation'))}}
+	</div>
 </div>
-<div id="next_btn_area">
-	<form><input type="submit" class="button" id="next_btn" value="Next" /></form>
-	{{#=A('Next', callback=URL(r=request,f='nextrecommendation'))}}
-</div>
-    </div>
 </body>

@@ -213,7 +213,7 @@ def recommend():
 			other_ingredient  = db.ingredients.with_alias('other_ingredient')
 			ingredient_name_query =  (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
 			ingredient_name_query |= (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
-			recommended_ingredients = db((db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=~db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
+			recommended_ingredients = db((db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
 			for each_recommended_ingredient in recommended_ingredients:
 				# a little hack. this needs more work
 				found = False
@@ -236,7 +236,7 @@ def recommend():
 ## Create an ingredient1, ingredient2, value=1 for each chosen_ingredient and recommended_ingredient
 def successfulrecommendation(): 
 	# compile one giant ingredient list
-	app_logging.info('Entering successfulrecommendation')
+	#app_logging.info('Entering successfulrecommendation')
 	ingredients = request.vars.values()[0]
 	ingredient_names = ingredients.split(',')
 
@@ -246,7 +246,7 @@ def successfulrecommendation():
 		ingredient_names[index] = each_ingredient = re.sub('_', ' ', each_ingredient)
 		if each_ingredient == '':
 			del ingredient_names[index]
-		app_logging.info('Converted ' + each_ingredient)
+	#	app_logging.info('Converted ' + each_ingredient)
 		
 	# for each ingredient, create an ingredient, other_ingredient, value=1 pairing		
 	for index in range(len(ingredient_names)):
@@ -254,11 +254,12 @@ def successfulrecommendation():
 		each_ingredient = ingredient_names[index]
 		#app_logging.info('Found ' + each_ingredient)
 		chosen_ingredient = db(db.ingredients.name == each_ingredient).select(db.ingredients.ALL)
-		app_logging.info('Found ' + str(chosen_ingredient.first()))
-		if chosen_ingredient != None:
-			app_logging.info('Found ' + str(chosen_ingredient.first().name))
-		else:
-			app_logging.info('Could not find ' + each_ingredient)
+	#	app_logging.info('Found ' + str(chosen_ingredient.first()))
+	#	if chosen_ingredient != None:
+	#		app_logging.info('Found ' + str(chosen_ingredient.first().name))
+
+		if chosen_ingredient == None:
+	#		app_logging.info('Could not find ' + each_ingredient)
 			continue
 		# remove the ingredient from the list
 		#ingredient_names = ingredient_names[index + 1:]
@@ -270,11 +271,11 @@ def successfulrecommendation():
 			#app_logging.info('Have ingredient1: ' + each_ingredient + ' and ingredient2: ' + str(other_ingredient.first()))
 			if other_ingredient.first() != None:
 				# create the weighted edge
-				app_logging.info('Creating an ingredient1: ' + each_ingredient + ' and ingredient2: ' + str(other_ingredient.first().name) + ' value pair.')
+	#			app_logging.info('Creating an ingredient1: ' + each_ingredient + ' and ingredient2: ' + str(other_ingredient.first().name) + ' value pair.')
 				db.ingredients_weighted_value.insert(ingredientId1=chosen_ingredient.first().id, ingredientId2=other_ingredient.first().id,value=1)
 
 	
-	app_logging.info('Leaving successfulrecommendation')
+	#app_logging.info('Leaving successfulrecommendation')
 	return ingredients
 	
 # create a function to accept input from the recommendations page. This will be ajax and should return true 
