@@ -97,10 +97,10 @@ def addcookingmethod():
 	
 def nextrecommendation():
 	session.recommendation_number = session.recommendation_number + 1
-	redirect(URL('recommendfun'))
+	#redirect(URL('recommend'))	
 	
 # alternative recommend to the ingredients - based on cooking style
-def recommendfun():
+def recommend():
 	#app_logging.info('\n\nEntering recommendfun')
 	## SKETCHY QUERYING:
 	## - find_ingredients_query happens twice

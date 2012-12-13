@@ -1,41 +1,43 @@
 {{extend 'layout.html'}}
 <head>
-
-	<style type="text/css">
-        body{
-            background-color:#424242;
-            color:white;
-        }
-        #simple_rec_ingredients{
-            color:red;    
-            font-size:25px;
-        }
-    </style>
+<link rel="stylesheet" href="{{=URL('static','css/ingredientstyle.css')}}">
+    <script type="text/javascript">  
+    jQuery(document).ready(function(){
+    });
+	
+	$(function() {  
+	  $('.error').hide();
+	  $("#next_btn").click(function() {  
+		$('.error').hide();
+		$.post("{{=URL(r=request,f='nextrecommendation')}}",{},function(result){
+			alert(result);
+			window.location.href = "recommend.html";
+        });
+		return true; 
+	  });  
+	}); 
+    </script>
 </head>
 <body>
-<h1>Try some lovely ingredients!</h1>
-<h4>You want to make some delicious foods using these ingredients:</h4>
-<div id=chosen_ingredients>
-{{for each_ingredient in ingredient_names_in_combo:}}
-{{=DIV(each_ingredient.name, _id='chosen_ing_'+each_ingredient.name, _class='chosen_ingredient')}}
+<h2>Try some lovely ingredients!</h2>
+<div id="recommended">
+ {{for rec in recommendations:}}<h4>
+	{{=rec[0]}} these ingredients!</h4>
+	{{for item in rec[1]:}}
+		{{=item}}<br/>
+	{{pass}}
+	<h5>with</h5>
+	{{for rec in rec[2]:}}
+		{{recId = re.sub(' ', '_', rec)}}
+		<button id='{{=recId}}' type='button' onclick = "$('#{{=recId}}').remove();">{{=rec}} ?</button>
+	{{pass}}
 {{pass}}
 </div>
-<h4>Try these recommendations </h4>
-<div id=simple_rec_ingredients>
-{{for each_recommendation in simple_rec_ingredients:}}
-{{=DIV(each_recommendation.other_ingredient.name, _id='simple_rec_'+each_recommendation.other_ingredient.name, _class='simple_rec_ingredient')}}
-{{pass}}
+<div id="success_btn_area">
+	<form><input type="submit" class="button" id="success_btn" value="Sounds Good!" /></form>
 </div>
-<h4>Or these recommendations </h4>
-<div id=complex_rec_ingredients>
-{{for each_recommendation in complex2_rec_ingredients:}}
-{{=DIV(each_recommendation, _id='complex_rec_'+each_recommendation, _class='complex_rec_ingredient')}}
-{{pass}}
-</div>
-<div id="soundsgood">
-    <input type="button" value="Sounds Good!"></input>
-    </div>
-<div id="nah">
-    <input type="button" value="Nah ->"></input>
+<div id="next_btn_area">
+	<form><input type="submit" class="button" id="next_btn" value="Next" /></form>
+	{{=A('Next', callback=URL(r=request,f='nextrecommendation'))}}
 </div>
 </body>
