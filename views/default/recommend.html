@@ -31,8 +31,8 @@
     </script>
 </head>
 <body>
-<h2>Try some lovely ingredients!</h2>
 <div id="recommended">
+<h2>Try some lovely ingredients!</h2>
  {{for rec in recommendations:}}<h4>
 	{{=rec[0]}} these ingredients!</h4>
 	{{for item in rec[1]:}}
@@ -44,7 +44,7 @@
 		<button id='{{=recId}}' type='button' onclick = "$('#{{=recId}}').remove();">{{=rec}} ✖</button>
 	{{pass}}
 {{pass}}
-</div>
+
     <br/>
     <br/>
     
@@ -55,4 +55,5 @@
 	<form><input type="submit" class="button" id="next_btn" value="Next" /></form>
 	{{#=A('Next', callback=URL(r=request,f='nextrecommendation'))}}
 </div>
+    </div>
 </body>
