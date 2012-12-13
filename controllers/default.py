@@ -230,6 +230,14 @@ def recommendfun():
 	#app_logging.info('Leaving recommendfun')
 	return dict(ingredient_names_in_combo=the_chosen_ingredients,cooking_methods_of_chosen_ingredients=cooking_methods_of_chosen_ingredients, recommendations=recommendations)
 	
+## this function will receive the information on the recommendation page when the user presses the "sounds good" button
+## Input: [[cooking_method, [chosen_ingredient_list], [recommended_ingredient_list]], ... []]
+##
+def successfulrecommendation(): 
+	recommendation_input = request.vars.values()
+	response.flash=T(str(recommendation_input))
+	return True
+	
 # create a function to accept input from the recommendations page. This will be ajax and should return true 
 def recieve_rating():
 	# this function will set ingredient_weighted_value.value for each ingredient in the combo and the ingredient "chosen" (clicked on)
