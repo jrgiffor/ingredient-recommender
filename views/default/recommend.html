@@ -41,7 +41,7 @@
 	<h5>with</h5>
 	{{for rec in rec[2]:}}
 		{{recId = re.sub(' ', '_', rec)}}
-		<button id='{{=recId}}' type='button' onclick = "$('#{{=recId}}').remove();">{{=rec}} ✖</button>
+		<button id='{{=recId}}' type='button' onclick = "$('#{{=recId}}').remove();">{{=rec}} ?</button>
 	{{pass}}
 {{pass}}
 </div>
