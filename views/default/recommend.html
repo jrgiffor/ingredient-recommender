@@ -22,8 +22,31 @@
 	  $("#success_btn").click(function() {  
 		$('.error').hide();
 		// time to grab the correct data and pass it to the backend
-		
-		$.post("{{=URL(r=request,f='successfulrecommendation')}}",{'hehe':'hehe'},function(result){
+		// go through each cooking_method and grab every chosen_ingredient_name and every recommended_ingredient_name 
+		var ingredientList = '';
+		re = /(rec_btn_|rec_ing_)([a-zA-Z0-9_]*)/i;
+		var divs=document.getElementsByTagName('div'), d, i=0;
+		while(d=divs[i++]) {
+			//d.id.match(/rec_btn_|rec_ing_/)?d.style.display='none':null;
+			found = d.id.match(re);
+			if (found != null) {
+			//	alert(found[2]);
+				ingredientList += found[2];
+				ingredientList += ',';
+			}
+		}
+		var buttons=document.getElementsByTagName('button'), b, i=0;
+		while(b=buttons[i++]) {
+			//d.id.match(/rec_btn_|rec_ing_/)?d.style.display='none':null;
+			found = b.id.match(re);
+			if (found != null) {
+			//	alert(found[2]);
+				ingredientList += found[2];
+				ingredientList += ',';
+			}
+
+		}
+		$.post("{{=URL(r=request,f='successfulrecommendation')}}",{ingredientList:ingredientList},function(result){
 			alert(result);
 			//window.location.href = "recommend.html";
         });
@@ -35,21 +58,29 @@
 <body>
 <div id="recommended">
 <h2>Try some lovely ingredients!</h2>
-  	<div id="cooking">
- {{for rec in recommendations:}}<h4>
-
-	{{=rec[0]}} these ingredients!</h4>
-	{{for item in rec[1]:}}
-		{{=item}}<br/>
-	{{pass}}
+  <div id="cooking">
+  {{for rec in recommendations:
+	order = []
+	cmId = re.sub(' ', '_', rec[0])
+	order.append(H4(rec[0] + ' these ingredients!', _id="cm_"+cmId, _class="cooking_method"))
+	for item in rec[1]:
+		itemId = re.sub(' ', '_', item)
+		order.append(DIV(item, _id="rec_ing_"+itemId, _class="recommended_ingredient"))
+	pass
+	#for rec in rec[2]:
+	#	recId = re.sub(' ', '_', rec)
+	#	order.append(FORM(INPUT(_type='submit', _value=rec+' ✖'), _onclick="$('#"+recId+"').remove();"))
+	#pass
+	=DIV(*order, _id="cm_rec_"+cmId)
+  }}
 	<h5>with</h5>
 	{{for rec in rec[2]:}}
 		{{recId = re.sub(' ', '_', rec)}}
-		<button id='{{=recId}}' type='button' onclick = "$('#{{=recId}}').remove();">{{=rec}} ✖</button>
+		<button id='rec_btn_{{=recId}}' type='button' onclick = "$('#rec_btn_{{=recId}}').remove();">{{=rec}} ✖</button>
 	{{pass}}
   
-{{pass}}
-    </div>
+  {{pass}}
+  </div>
     <br/>
     <br/>
     
