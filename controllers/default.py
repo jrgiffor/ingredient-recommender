@@ -235,8 +235,7 @@ def recommend():
 ## Input: [[cooking_method, [chosen_ingredient_list], [recommended_ingredient_list]], ... []]
 ##
 def successfulrecommendation(): 
-	#recommendation_input = request.vars.values()[0]
-	#response.flash=T(str(recommendation_input))
+	recommendation_input = request.vars.values()[0]
 	return 'hehe'
 	
 # create a function to accept input from the recommendations page. This will be ajax and should return true 

@@ -22,7 +22,7 @@
 	  $("#success_btn").click(function() {  
 		$('.error').hide();
 		$.post("{{=URL(r=request,f='successfulrecommendation')}}",{},function(result){
-			//alert(result);
+			alert(result);
 			window.location.href = "recommend.html";
         });
 		return false; 
