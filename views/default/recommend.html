@@ -10,12 +10,24 @@
 	  $("#next_btn").click(function() {  
 		$('.error').hide();
 		$.post("{{=URL(r=request,f='nextrecommendation')}}",{},function(result){
-			alert(result);
+			//alert(result);
 			window.location.href = "recommend.html";
         });
-		return true; 
+		return false; 
 	  });  
-	}); 
+	});
+
+	$(function() {  
+	  $('.error').hide();
+	  $("#success_btn").click(function() {  
+		$('.error').hide();
+		$.post("{{=URL(r=request,f='successfulrecommendation')}}",{},function(result){
+			//alert(result);
+			window.location.href = "recommend.html";
+        });
+		return false; 
+	  });  
+	}); 	
     </script>
 </head>
 <body>
@@ -38,6 +50,6 @@
 </div>
 <div id="next_btn_area">
 	<form><input type="submit" class="button" id="next_btn" value="Next" /></form>
-	{{=A('Next', callback=URL(r=request,f='nextrecommendation'))}}
+	{{#=A('Next', callback=URL(r=request,f='nextrecommendation'))}}
 </div>
 </body>

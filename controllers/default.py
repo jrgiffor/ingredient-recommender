@@ -98,6 +98,7 @@ def addcookingmethod():
 def nextrecommendation():
 	session.recommendation_number = session.recommendation_number + 1
 	#redirect(URL('recommend'))	
+	return 'hehe'
 	
 # alternative recommend to the ingredients - based on cooking style
 def recommend():
@@ -234,9 +235,9 @@ def recommend():
 ## Input: [[cooking_method, [chosen_ingredient_list], [recommended_ingredient_list]], ... []]
 ##
 def successfulrecommendation(): 
-	recommendation_input = request.vars.values()
-	response.flash=T(str(recommendation_input))
-	return True
+	#recommendation_input = request.vars.values()[0]
+	#response.flash=T(str(recommendation_input))
+	return 'hehe'
 	
 # create a function to accept input from the recommendations page. This will be ajax and should return true 
 def recieve_rating():
