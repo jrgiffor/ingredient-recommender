@@ -14,6 +14,22 @@ from gluon.tools import Crud
 from math import sqrt
 import time
 import operator
+import copy
+
+def _init_log():
+    import os,logging,logging.handlers,time 
+    logger = logging.getLogger(request.application) 
+    logger.setLevel(logging.INFO) 
+    handler = logging.handlers.RotatingFileHandler(os.path.join(
+        request.folder,'logs','applog.log'),'a',1024*1024,1) 
+    handler.setLevel(logging.INFO) #or DEBUG
+    handler.setFormatter(logging.Formatter( 
+        '%(asctime)s %(levelname)s %(filename)s %(lineno)d %(funcName)s(): %(message)s')) 
+    logger.addHandler(handler) 
+    return logger
+    
+app_logging = cache.ram('app_wide_log',lambda:_init_log(),time_expire=None)
+
 
 def index():
 
@@ -29,6 +45,7 @@ def createcombination():
 	
 	combinationid = db.combinations.insert(name="temp")
 	session.comboId = combinationid
+	session.recommendation_number = 0
 	for each_ingredient in ingredient_list:
 		full_ingredient = db(db.ingredients.name.lower() == str(each_ingredient).lower()).select().first()
 		if full_ingredient != None:
@@ -52,17 +69,8 @@ def ajaxlivesearch():
     return TAG[''](*items)
   
 def addingredient():
-	add_ingredient_form = SQLFORM(db.ingredients)
 	# this adds the ingredient automatically and stores it in form.vars.id
-	if add_ingredient_form.process().accepted:
-		# grab all ingredients that are not the newly inserted
-		other_ingredients = db(db.ingredients.id!=add_ingredient_form.vars.id).select()
-		# add a relation to each other ingredients
-		if other_ingredients != None:		
-			for each_ingredient in other_ingredients:
-				db.ingredients_weighted_value.insert(ingredientId1=add_ingredient_form.vars.id,ingredientId2=each_ingredient.id, value=0.5)
-	else:
-		response.flash=T('Meow')
+	add_ingredient_form = SQLFORM(db.ingredients)
 	return dict(add_ingredient_form=add_ingredient_form)
  
 # this is a back end function that will add a cooking method for each ingredient
@@ -74,7 +82,7 @@ def addcookingmethod():
               _method="post", _action="")
 			  
 	if form.accepts(request, session):
-		response.flash=T(str(request.vars))
+		#response.flash=T(str(request.vars))
 		cooking_method = request.vars.name
 		for each_key in request.vars.keys():
 			the_ingredient = ingredients.find(lambda ingredient: ingredient.name==each_key).first()
@@ -86,62 +94,141 @@ def addcookingmethod():
 		response.flash=T('Please enter a cooking method and select all relevant ingredients.')		
 		#response.flash=T('fail ' + str(request.vars))
 	return dict(form=form)
-
-
-# alternative recommend to the ingredients - based on cooking style
-	# find all cooking_methods that are used to cook a chosen ingredient
-	# sort them by the most common
-	# recommend the cooking_method 
-	# recommend other ingredients in that cooking_method to the user sorted by highest rating
 	
-	# perhaps offer some additional ingredients not dependent on cooking style
+def nextrecommendation():
+	session.recommendation_number = session.recommendation_number + 1
+	redirect(URL('recommendfun'))
+	
+# alternative recommend to the ingredients - based on cooking style
+def recommendfun():
+	#app_logging.info('\n\nEntering recommendfun')
+	## SKETCHY QUERYING:
+	## - find_ingredients_query happens twice
+	##   - can possibly combine find_ingredients_query and find_cooking_methods
 
-
-def recommend():
-	total_group_of_edges = None
-	# grab all the ingredients in the combo
+	## NOT NECCESSARY - HELPS FOR DEBUGGING
+	# grab all the ingredients in the combo 
 	find_ingredients_query = db.ingredients_in_combination.combinationId == session.comboId
 	find_ingredients_query &= db.ingredients_in_combination.ingredientId == db.ingredients.id
-	ingredients_in_combo = db(find_ingredients_query).select(db.ingredients.id)
-	ingredient_names_in_combo = db(find_ingredients_query).select(db.ingredients.name, db.ingredients.type)
-	# select all ingredient relations that have only one ingredient in the combo
-	#lhs_ingredients = db(db.ingredients_weighted_value.ingredientId1==each_ingredient.id).select()
-	chosen_ingredient = db.ingredients.with_alias('chosen_ingredient')
-	other_ingredient  = db.ingredients.with_alias('other_ingredient')
+	ingredients_in_combo = db(find_ingredients_query).select(db.ingredients.ALL)
+	## REMOVE FOR PERFORMANCE
 	
-	#ingredient_name_query =  (chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
-	#ingredient_name_query |= (chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
+	## This function should now look at the session variable: recommendation_number
+	if session.recommendation_number == None:
+		session.recommendation_number = 0
+	recommendation_number = session.recommendation_number
 	
-	# grab all ingredients related to the one chosen
-	ingredient_name_query =  chosen_ingredient.id.belongs(ingredients_in_combo)
-	ingredient_name_query &= ~other_ingredient.id.belongs(ingredients_in_combo)
+	# find all cooking_methods that are used to cook a chosen ingredient
+	find_cooking_methods = (db.cooking_methods.ingredientId == db.ingredients.id) & (db.cooking_methods.value == 0.5)
+	# group and order the rows by the CM.name and the count of of the rows of each
+	method_count = db.cooking_methods.method.count()
+	cooking_methods_of_chosen_ingredients = db(find_ingredients_query & find_cooking_methods).select(db.cooking_methods.method, method_count, groupby=db.cooking_methods.method, orderby=~method_count)
 	
-	# let this save the value of the computed "closest distance"
-	compute_value = {}
-	# things to do to improve complex_rec_ingredients:
-	# take the "closest distance" for all the ingredients. 
-	# let val(ingredient1, ingredient2) stand for the AVG value of all ingredient1-ingredient2, value pairings
-	# and "closest distance" would be sqrt(val(ingredient1,ingredientK)^2 + val(ingredient2,ingredientK)^2 + ... + val(ingredientN,ingredientK)^2)
-	# for example for the ingredient pairings: beef-bell pepper and beef-onion, 
-	#	"closest distance" ranking for beef would be sqrt(val(beef, bell pepper)^2 + val(beef, onion)^2)
-	complex_rec_ingredients = db(ingredient_name_query).select(chosen_ingredient.name, other_ingredient.name, db.ingredients_weighted_value.value.avg().with_alias('AVG_ing_value'), groupby=chosen_ingredient.name|other_ingredient.name)
-	for each_ingredient in complex_rec_ingredients:
-		if each_ingredient.other_ingredient.name in compute_value:
-			ongoing_value = compute_value[each_ingredient.other_ingredient.name]
-			#response.flash=T(str(ongoing_value))
-			compute_value[each_ingredient.other_ingredient.name] = sqrt(pow(ongoing_value, 2) + pow(each_ingredient.AVG_ing_value, 2))
-		else:
-			compute_value[each_ingredient.other_ingredient.name] = each_ingredient.AVG_ing_value
+	## choosing the cooking style
+	## The goal here is to create a list of cooking recommendations.
+	## Each cooking recommendation consists of a [cooking method, the ingredients chosen with that cooking method, and the ingredients recommended] 
 	
-	sorted_recommendations = sorted(compute_value.iteritems(), key=operator.itemgetter(1))
-	top_ingredients = []
-	# this will grab the top three ingredients
-	for index in range(3):
-		top_ingredients.append(sorted_recommendations[index][0])
+	# let unused stand for every ingredient in the chosen combination not currently being used
+	unused = ingredients_in_combo
+	
+	## DEBUGGING
+	the_chosen_ingredients = ingredients_in_combo.as_list()
+	##
+	
+	#response.flash=T(str(unused.first()))
+	# this is the data passed to the front end. It will be a list of tuples [CM name, list_of_ingredients, list_of_recommendations]
+	recommendations = []
+	for index in range(len(cooking_methods_of_chosen_ingredients)):
+		each_cooking_method = cooking_methods_of_chosen_ingredients[index]
 		
-	simple_rec_ingredients = db(ingredient_name_query).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
-	# , complex_rec_ingredients=top_ingredients
-	return dict(ingredient_names_in_combo=ingredient_names_in_combo,simple_rec_ingredients=simple_rec_ingredients, complex2_rec_ingredients=top_ingredients)
+		# this forces the recommendations to ignore the major cooking methods
+		if index < recommendation_number:
+			continue
+		
+		# chosen_ingredient_list are the ingredients that are a part of this CM
+		chosen_ingredients = db((each_cooking_method.cooking_methods.method==db.cooking_methods.method) & (db.cooking_methods.ingredientId==db.ingredients.id) & (find_ingredients_query)).select(db.ingredients.ALL)
+		
+		nothing_free = True
+		# Save the names of the ingredients in a list
+		chosen_ingredient_list = []
+		#app_logging.info('Choosing ingredients for the cooking method: ' + str(each_cooking_method.cooking_methods.method))
+		#app_logging.info('Chosen_ingredients: ' + str(chosen_ingredients))
+		for each_chosen_ingredient in chosen_ingredients:
+			# make sure that the ingredient is unused
+			#app_logging.info('Current ingredient ' + str(each_chosen_ingredient.name))
+			#app_logging.info('Unused: ' + str(unused))
+			unused_ingredient = unused.find(lambda ingredients: ingredients.name == each_chosen_ingredient.name)
+			if unused_ingredient.first() != None:
+				#app_logging.info('Chose ' + str(unused_ingredient.first().name))
+				chosen_ingredient_list.insert(0, each_chosen_ingredient.name)
+				unused = unused.exclude(lambda ingredients: ingredients.name!=each_chosen_ingredient.name)
+				nothing_free = False
+		
+		# Skip over this cooking method if there are no free ingredients
+		if nothing_free:
+			continue
+			
+		## Method of recommendation:
+		## look through each ingredient chosen
+		recommend_ingredient_list = []
+		## There is a choice here:
+		## Use a for loop to go through all of the chosen ingredients
+		## OR
+		## Create a massive query that includes the chosen ingredients query
+		for each_chosen_ingredient in chosen_ingredients:
+			## This looks through all ingredients that are related to the ingredient in question
+			other_ingredient  = db.ingredients.with_alias('other_ingredient')
+			ingredient_name_query =  (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
+			ingredient_name_query |= (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
+			recommended_ingredients = db((each_cooking_method.cooking_methods.method==db.cooking_methods.method) & (db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
+			#recommended_ingredients = db(ingredient_name_query).select(each_chosen_ingredient.id, other_ingredient.name)
+			#response.flash=T(str(recommended_ingredients))
+			for each_recommended_ingredient in recommended_ingredients:
+				# a little hack. this needs more work
+				found = False
+				for each_ingredient in recommend_ingredient_list:
+					if each_ingredient == each_recommended_ingredient.other_ingredient.name:
+						found = True
+				if found == False:
+					recommend_ingredient_list.insert(0, each_recommended_ingredient.other_ingredient.name)
+			
+		# recommend_ingredient_list are the ingredients that are to be recommended		
+		# recommendation.insert(0, [ CM.name, ingredient_list ])
+		recommendation = [each_cooking_method.cooking_methods.method, chosen_ingredient_list, recommend_ingredient_list]
+		recommendations.append(recommendation)
+		
+		# end the loop if all the ingredients are used
+		if unused.first() == None:
+			break
+	
+	# if there are ingredients not in a cooking method
+	if unused.first() != None:
+		chosen_ingredient_list = []
+		recommend_ingredient_list = []
+		for each_chosen_ingredient in unused:
+			chosen_ingredient_list.insert(0, each_chosen_ingredient.name)
+			
+			## This looks through all ingredients that are related to the ingredient in question
+			other_ingredient  = db.ingredients.with_alias('other_ingredient')
+			ingredient_name_query =  (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
+			ingredient_name_query |= (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
+			recommended_ingredients = db((db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
+			for each_recommended_ingredient in recommended_ingredients:
+				# a little hack. this needs more work
+				found = False
+				for each_ingredient in recommend_ingredient_list:
+					if each_ingredient == each_recommended_ingredient.other_ingredient.name:
+						found = True
+				if found == False:
+					recommend_ingredient_list.insert(0, each_recommended_ingredient.other_ingredient.name)
+		
+		recommendation = ['You can also add in', chosen_ingredient_list, recommend_ingredient_list]
+		recommendations.append(recommendation)
+		
+		# Have to figure out something to do
+	cooking_methods_of_chosen_ingredients
+	#app_logging.info('Leaving recommendfun')
+	return dict(ingredient_names_in_combo=the_chosen_ingredients,cooking_methods_of_chosen_ingredients=cooking_methods_of_chosen_ingredients, recommendations=recommendations)
 	
 # create a function to accept input from the recommendations page. This will be ajax and should return true 
 def recieve_rating():

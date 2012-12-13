@@ -1,0 +1,26 @@
+{{extend 'layout.html'}}
+<head>
+	<link rel="stylesheet" href="{{=URL('static','css/ingredientstyle.css')}}">
+</head>
+<body>
+<h2>Try some lovely ingredients!</h2>
+<div id="recommended">
+ {{for rec in recommendations:}}<h4>
+	{{=rec[0]}} these ingredients!</h4>
+	{{for item in rec[1]:}}
+		{{=item}}<br/>
+	{{pass}}
+	<h5>with</h5>
+	{{for rec in rec[2]:}}
+		{{recId = re.sub(' ', '_', rec)}}
+		<button id='{{=recId}}' type='button' onclick = "$('#{{=recId}}').remove();">{{=rec}} ✖</button>
+	{{pass}}
+{{pass}}
+</div>
+<div id="soundsgood">
+    <input type="button" value="Sounds Good!"></input>
+    </div>
+<div id="nah">
+    <input type="button" value="Nah ->"></input>
+</div>
+</body>
