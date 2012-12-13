@@ -45,7 +45,11 @@ body {
 		margin-left: -400px;
 	}
 
-
+	#recommended{
+		background-color: #F1F1F1;
+		width: 800px;
+		border-radius: 5px 5x 5px 5px;
+	}
 	#listingredientsbox{
 		width:40%;
 		height:70%;
@@ -169,5 +173,3 @@ body {
         margin-left: 25px;
         margin-right: 25px;
     }
-	
-	
