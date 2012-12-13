@@ -69,17 +69,25 @@ body {
 		border-style: solid;
 		border-color: black;
 	}
+	#cooking{
+	border: 2px;
+		padding: 5px;
+		border-top: 3px solid #E8E8E8;
+		border-bottom: 3px solid #E8E8E8;
 	
+}
 	#recommend{
 		background-color:#47B5FF;
 		position: fixed;
+		border-style: solid;
+		border-color: black;
 		top:65%;
 		left:25%;
 		height:7.5%;
 		width:50%;
 		border: 2px;
-		border-style: solid;
 		border-color: black;
+		border-top: 3px solid #E8E8E8;
 		border-radius: 15px 15px 15px 15px;		
 		text-align: center;	
 	}
