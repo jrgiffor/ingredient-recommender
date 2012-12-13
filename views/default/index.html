@@ -101,7 +101,7 @@
 			ingredientList += ',';
 		}
 		$.post("{{=URL(r=request,f='createcombination')}}",{ingredientList:ingredientList},function(result){
-					 window.location.href = "recommendfun.html";
+					 window.location.href = "recommend.html";
         });
 		return false; 
 	  });  
@@ -134,14 +134,14 @@
 	<div id="ingredientsbox">
 		<div id="combinationform">
 		<form action="" enctype="multipart/form-data" method="post">
-			<br /><label for="ingredient_search">Search ingredients:</label>
+			<center><h3> Search </h3></center>
 			<input type="text" id="ingredient_search" name="ingredient_search" autocomplete="off" onkeyup="getData(this.value);" />
-			<div id="ajaxresults"></div>
 			<input type="submit" name="submit" class="button" id="submit_btn" value="Add" />
+			<div id="ajaxpad"><div id="ajaxresults"></div></div>
 		</form>
 		</div>
 		<div id="ingredientList">
-			<h3> Choices </h3>
+			<center><h3> Choices </h3></center>
 			<div class="chosen_ingredients"> 
 				<button id='i1' type='button' onclick = "$('#i1').html('');$('#i1').hide();">Add</button>
 				<button id='i2' type='button' onclick = "$('#i2').html('');$('#i2').hide();">Add</button>

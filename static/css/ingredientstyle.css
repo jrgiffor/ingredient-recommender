@@ -1,20 +1,20 @@
 body {
+
+		//background-color: #FFFFD6;
 		background-image:url('../images/ingredients/pattern.png');
 		background-repeat:repeat;
 		font-family: 'Arial', serif;
 		font-size: 18px;
 		color:#1A1A1A
 		text-align: center;
+		overflow: auto;
 	}
 	h1{
 		font-size: 50px;
 		text-align: center;
 	}
-	h2{
-		
-	}
 	h3{
-        font-family: 'Arial', serif;
+            font-family: 'Arial', serif;
 	}
 	a{
 		color:#000000;
@@ -23,7 +23,7 @@ body {
 		color:#D8D8D8;
 	}
 
-
+/*
 	#ingredientsbox{		
 		background-color:#F1F1F1;
 		width:50%;
@@ -31,18 +31,29 @@ body {
 		top:25%;
 		left:25%;
 		position: fixed;
-		border: 1px;
-		border-style: solid;
-		border-color: #E8E8E8;
 		border-radius: 5px 5x 5px 5px;
 	}
+*/
+	#ingredientsbox {
+		background-color: #F1F1F1;
+		width: 800px;
+		height: 400px;
+		top: 200px;
+		left: 50%;
+		position: fixed;
+		border-radius: 5px 5x 5px 5px;
+		margin-left: -400px;
+	}
+
+
 	#listingredientsbox{
 		width:40%;
 		height:70%;
 		top:10%;
 		left:55%;
-		position: relative;
-		border: 1px;
+		position: fixed;
+		border: 3px;
+		margin-r: -3px;
 		border-style: solid;
 		border-color: black;
 	}
@@ -79,16 +90,25 @@ body {
     #ajaxresults{
         background: #ffffff;
         padding: 5px 10px;
-        max-height: 400px;
+        max-height: 220px;
         overflow: auto;
-        position: absolute;
-        z-index: 99;
+        z-index: 150;
         border: 1px solid #A9A9A9;
         border-width: 0 1px 1px 1px;
         -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
         -moz-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
         -box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+        margin-top: -12px;
+		padding-left:20px;
+		position: relative;
     }
+	
+	#ajaxpad{
+        width: 26%;
+        margin-left: 10%;
+        z-index: 999;
+        position: absolute;
+	}
     #ajaxresults a{
         color:#666666;
     }
@@ -98,27 +118,56 @@ body {
         background-color:#ffffff;
         padding: 5px 5px 5px 5px;
 		position: relative;
-        max-width:300px;
-        height:5%;
+        width:50%;
+        height:15px;
         border:1px solid #999999;
-		margin-right: 15px;
-		margin-left: 15px;
-		margin-top:8px;
+		margin-left: 20%;
     }
 	
 	#recommendsubmit {
-	position:relative;
 	position:absolute;
-	bottom:5px;
-	left: 50%;
-	margin-left: -47.5px;
+	bottom:0px;
+	left: 0px;
+	text-align: center;
+	width: 100%;
+	border-top: 3px solid #E8E8E8;
+	height:20%;
 	}
-	#recommended{
-		background-color:#F1F1F1;
-    	border: 1px;
-		border-style: solid;
-		border-color: #E8E8E8;
-		border-radius: 5px 5x 5px 5px;
-    	width:50%;
-    	
+	
+    #recommend_btn {
+        margin-top: 15px;
     }
+	
+	#combinationform {
+	float: left;
+    width: 50%;
+	height: 80%;
+	overflow:show;
+	border-right: 2px solid #E8E8E8;
+	margin-right: -2px;
+	}
+	
+	#ingredientList {
+	float: right;
+	width: 50%;
+	height: 80%;
+    border-left: 1px solid #E8E8E8;
+	margin-left: -1px;
+	}
+	
+	#seperator{
+	width:1px;
+	border-left:1px solid #E8E8E8;
+	border-right:1px solid #E8E8E8;
+	}
+	
+    #submit_btn {
+	margin-top: -6px;
+	}
+	
+	.chosen_ingredients {
+        margin-left: 25px;
+        margin-right: 25px;
+    }
+	
+	
