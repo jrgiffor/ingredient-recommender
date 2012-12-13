@@ -236,7 +236,7 @@ def recommend():
 ##
 def successfulrecommendation(): 
 	recommendation_input = request.vars.values()[0]
-	return 'hehe'
+	return recommendation_input
 	
 # create a function to accept input from the recommendations page. This will be ajax and should return true 
 def recieve_rating():

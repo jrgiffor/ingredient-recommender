@@ -21,9 +21,11 @@
 	  $('.error').hide();
 	  $("#success_btn").click(function() {  
 		$('.error').hide();
-		$.post("{{=URL(r=request,f='successfulrecommendation')}}",{},function(result){
+		// time to grab the correct data and pass it to the backend
+		
+		$.post("{{=URL(r=request,f='successfulrecommendation')}}",{'hehe':'hehe'},function(result){
 			alert(result);
-			window.location.href = "recommend.html";
+			//window.location.href = "recommend.html";
         });
 		return false; 
 	  });  
