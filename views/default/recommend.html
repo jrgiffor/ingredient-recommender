@@ -29,6 +29,7 @@
 	  $('.error').hide();
 	  $("#success_btn").click(function() {  
 		$('.error').hide();
+		$("#success_btn").hide();
 		// time to grab the correct data and pass it to the backend
 		// go through each cooking_method and grab every chosen_ingredient_name and every recommended_ingredient_name 
 		var ingredientList = '';
@@ -56,11 +57,10 @@
 		}
 		$.post("{{=URL(r=request,f='successfulrecommendation')}}",{ingredientList:ingredientList},function(result){
 			//alert(result);
-			this.remove();
 			//window.location.href = "recommend.html";
         });
-		return false; 
 
+		return false; 
 	  });  
 	}); 	
     </script>
