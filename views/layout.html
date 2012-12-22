@@ -47,7 +47,7 @@
   }}
 
   {{include 'web2py_ajax.html'}}
-
+  <link rel="stylesheet" href="{{=URL('static','css/ingredientstyle.css')}}">
   {{
   # using sidebars need to know what sidebar you want to use
   left_sidebar_enabled = globals().get('left_sidebar_enabled',False)
@@ -71,12 +71,12 @@
     <div class="navbar-inner">
       <div class="container">
         <!-- the next tag is necessary for bootstrap menus, do not remove -->
-        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+       <!-- <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
-        </a>
-        <a class="brand" href="#">web2py&trade;&nbsp;</a>
+        </a>-->
+        <a class="brand" href="#">INGRCMDR</a>
         <ul id="navbar" class="nav pull-right">{{='auth' in globals() and auth.navbar(mode="dropdown") or ''}}</ul>
         <div class="nav-collapse">
           {{is_mobile=request.user_agent().is_mobile}}

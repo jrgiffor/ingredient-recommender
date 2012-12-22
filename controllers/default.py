@@ -41,7 +41,9 @@ def createcombination():
 	ingredient_input = request.vars.values()[0]
 	ingredient_output = ''
 	ingredient_list = ingredient_input.split(',')
-	# Delete the previous combination if making a new one unless they log in
+	# is the user logged in?
+	# yes - store the combo under their userid
+	# no  - store the combo with temp
 	
 	combinationid = db.combinations.insert(name="temp")
 	session.comboId = combinationid
@@ -107,12 +109,14 @@ def recommend():
 	## - find_ingredients_query happens twice
 	##   - can possibly combine find_ingredients_query and find_cooking_methods
 
-	## NOT NECCESSARY - HELPS FOR DEBUGGING
 	# grab all the ingredients in the combo 
 	find_ingredients_query = db.ingredients_in_combination.combinationId == session.comboId
 	find_ingredients_query &= db.ingredients_in_combination.ingredientId == db.ingredients.id
 	ingredients_in_combo = db(find_ingredients_query).select(db.ingredients.ALL)
-	## REMOVE FOR PERFORMANCE
+	
+	## DEBUGGING
+	the_chosen_ingredients = ingredients_in_combo.as_list()
+	## REMOVE FOR PERFORMANCE	
 	
 	## This function should now look at the session variable: recommendation_number
 	if session.recommendation_number == None:
@@ -132,11 +136,9 @@ def recommend():
 	# let unused stand for every ingredient in the chosen combination not currently being used
 	unused = ingredients_in_combo
 	
-	## DEBUGGING
-	the_chosen_ingredients = ingredients_in_combo.as_list()
-	##
+	# This is the master list of every ingredient recommended. It stands to make sure ingredients are not recommended twice
+	all_recommended_ingredients = []
 	
-	#response.flash=T(str(unused.first()))
 	# this is the data passed to the front end. It will be a list of tuples [CM name, list_of_ingredients, list_of_recommendations]
 	recommendations = []
 	for index in range(len(cooking_methods_of_chosen_ingredients)):
@@ -161,6 +163,7 @@ def recommend():
 			unused_ingredient = unused.find(lambda ingredients: ingredients.name == each_chosen_ingredient.name)
 			if unused_ingredient.first() != None:
 				#app_logging.info('Chose ' + str(unused_ingredient.first().name))
+				all_recommended_ingredients.insert(0, each_chosen_ingredient.name)
 				chosen_ingredient_list.insert(0, each_chosen_ingredient.name)
 				unused = unused.exclude(lambda ingredients: ingredients.name!=each_chosen_ingredient.name)
 				nothing_free = False
@@ -170,29 +173,32 @@ def recommend():
 			continue
 			
 		## Method of recommendation:
-		## look through each ingredient chosen
 		recommend_ingredient_list = []
-		## There is a choice here:
-		## Use a for loop to go through all of the chosen ingredients
-		## OR
-		## Create a massive query that includes the chosen ingredients query
 		for each_chosen_ingredient in chosen_ingredients:
 			## This looks through all ingredients that are related to the ingredient in question
 			other_ingredient  = db.ingredients.with_alias('other_ingredient')
 			ingredient_name_query =  (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId1) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId2)
 			ingredient_name_query |= (each_chosen_ingredient.id == db.ingredients_weighted_value.ingredientId2) & (other_ingredient.id == db.ingredients_weighted_value.ingredientId1)
-			recommended_ingredients = db((each_cooking_method.cooking_methods.method==db.cooking_methods.method) & (db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg(), limitby=(0, 3))
+			recommended_ingredients = db((each_cooking_method.cooking_methods.method==db.cooking_methods.method) & (db.cooking_methods.ingredientId==other_ingredient.id) & (ingredient_name_query)).select(other_ingredient.name, db.ingredients_weighted_value.value.avg(), groupby=other_ingredient.name, orderby=db.ingredients_weighted_value.value.avg())
 			#recommended_ingredients = db(ingredient_name_query).select(each_chosen_ingredient.id, other_ingredient.name)
-			#response.flash=T(str(recommended_ingredients))
+			
+			# Only take the names of the recommended ingredients not already recommended
 			for each_recommended_ingredient in recommended_ingredients:
 				# a little hack. this needs more work
 				found = False
-				for each_ingredient in recommend_ingredient_list:
+				for each_ingredient in all_recommended_ingredients:
 					if each_ingredient == each_recommended_ingredient.other_ingredient.name:
 						found = True
 				if found == False:
 					recommend_ingredient_list.insert(0, each_recommended_ingredient.other_ingredient.name)
-			
+					all_recommended_ingredients.insert(0, each_recommended_ingredient.other_ingredient.name)
+		
+		# It might be smart to store all the recommendations in a psuedo sorted order
+		# Pros: Lets the service respond with a recommendation pretty quickly
+		# Cons: Takes up storage space
+		
+		# limit the total number of recommendations to three per cooking method
+		recommend_ingredient_list = recommend_ingredient_list[0:3]
 		# recommend_ingredient_list are the ingredients that are to be recommended		
 		# recommendation.insert(0, [ CM.name, ingredient_list ])
 		recommendation = [each_cooking_method.cooking_methods.method, chosen_ingredient_list, recommend_ingredient_list]
